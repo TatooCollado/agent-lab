@@ -25,11 +25,19 @@ describe("GET /api/evals/catalog", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.execution).toBe("npm run evals:run");
-    expect(response.body.cases).toHaveLength(8);
-    expect(response.body.cases[6]).toMatchObject({
-      id: "source-of-truth-freshness",
-      technique: "Dynamic fixture evaluation",
-    });
+    expect(response.body.cases).toHaveLength(9);
+    expect(response.body.cases).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "source-of-truth-freshness",
+          technique: "Dynamic fixture evaluation",
+        }),
+        expect.objectContaining({
+          id: "semantic-robustness-v1",
+          execution: "npm run semantic:eval",
+        }),
+      ]),
+    );
   });
 
   it("requires authentication", async () => {

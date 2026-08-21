@@ -332,7 +332,7 @@ describe("App", () => {
     expect(screen.getByText("CI/CD")).toBeInTheDocument();
     expect(screen.getByText("Quality Gates")).toBeInTheDocument();
     expect(screen.getByText("Deployment Smoke Test")).toBeInTheDocument();
-    expect(screen.getByText("Capability Routing")).toBeInTheDocument();
+    expect(screen.getByText("Semantic Routing")).toBeInTheDocument();
     expect(screen.getByText("Deterministic Presentation")).toBeInTheDocument();
     expect(screen.getByText("Set Complement")).toBeInTheDocument();
     expect(screen.getByText("Controlled Retry")).toBeInTheDocument();
@@ -342,6 +342,9 @@ describe("App", () => {
       await screen.findByRole("heading", { name: "Resilience policy" }),
     ).toBeInTheDocument();
     expect(await screen.findByText("list_employees")).toBeInTheDocument();
-    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(32);
+    expect(screen.getByText("Semantic Robustness")).toBeInTheDocument();
+    expect(screen.getByText("Decision Validation")).toBeInTheDocument();
+    expect(screen.getByText("Repeated-run Stability")).toBeInTheDocument();
+    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(37);
   });
 });

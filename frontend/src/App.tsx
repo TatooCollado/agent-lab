@@ -41,7 +41,7 @@ const concepts = [
   ["22", "CI/CD", "GitHub Actions + Vercel Git integration"],
   ["23", "Quality Gates", "Typecheck + build + tests + audit"],
   ["24", "Deployment Smoke Test", "API + proxy + frontend contract"],
-  ["25", "Capability Routing", "Deterministic intent → least-capability tool"],
+  ["25", "Semantic Routing", "LLM proposal → backend validation → MCP"],
   [
     "26",
     "Deterministic Presentation",
@@ -57,6 +57,11 @@ const concepts = [
     "Grounded answerPayload survives narration failure",
   ],
   ["32", "Fault Injection", "Controlled failure · resilience evaluation"],
+  ["33", "Semantic Robustness", "Neutral + Rioplatense Spanish benchmark"],
+  ["34", "Decision Validation", "Allowlist + Zod + temporal invariants"],
+  ["35", "Clarification Contract", "Ambiguous · missing period · no MCP"],
+  ["36", "Repeated-run Stability", "Intent · tool · arguments · temporal"],
+  ["37", "Baseline Comparison", "Stage 10 before → Stage 11 after"],
 ];
 
 function errorMessage(error: unknown): string {
@@ -73,9 +78,16 @@ function errorMessage(error: unknown): string {
   if (code === "llm_provider_unavailable")
     return "The LLM provider is temporarily unavailable.";
   if (code === "invalid_agent_query") return "The question is invalid.";
-  if (code === "unsupported_agent_query") {
-    return "Query outside the supported capability matrix. Check System index for examples.";
+  if (code === "agent_clarification_required") {
+    return error instanceof AgentQueryError && error.clarification
+      ? error.clarification
+      : "La consulta necesita una aclaración antes de ejecutar herramientas.";
   }
+  if (code === "unsupported_agent_query") {
+    return "La consulta requiere una capability que todavía no está soportada.";
+  }
+  if (code === "invalid_agent_decision")
+    return "El backend rechazó una decisión semántica inválida.";
   if (code === "agent_execution_failed") {
     return error instanceof AgentQueryError && error.requestId
       ? `Agent execution failed · Request ID: ${error.requestId}`
@@ -190,7 +202,7 @@ export function App() {
           <code>{user.role}</code>
           <button onClick={() => void signOut()}>Sign out</button>
         </div>
-        <div className="stage-badge">Stage 10 · Resilient execution</div>
+        <div className="stage-badge">Stage 11 · Semantic robustness</div>
       </header>
 
       <main id="top">

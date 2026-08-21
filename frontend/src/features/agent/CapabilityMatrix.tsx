@@ -14,12 +14,26 @@ export function CapabilityMatrix() {
   return (
     <section className="capability-matrix" aria-labelledby="capability-title">
       <div className="index-heading">
-        <span className="eyebrow">Deterministic routing</span>
+        <span className="eyebrow">Validated semantic routing</span>
         <h2 id="capability-title">Capability matrix</h2>
         <p>
-          Each supported intent narrows the LLM to one least-capability MCP
-          tool.
+          The LLM proposes one semantic decision. The backend validates its
+          capability, schema, period and safety boundaries before MCP executes.
         </p>
+        <ol className="semantic-contract">
+          <li>
+            <strong>LLM proposal</strong> — 7 MCP capabilities plus
+            clarification and unsupported control decisions.
+          </li>
+          <li>
+            <strong>Backend validation</strong> — allowlist, Zod arguments,
+            temporal consistency, polarity and business boundaries.
+          </li>
+          <li>
+            <strong>MCP execution</strong> — only a validated read-only decision
+            can query PostgreSQL.
+          </li>
+        </ol>
       </div>
       {failed ? (
         <p>Capability catalog unavailable.</p>

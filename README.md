@@ -7,7 +7,7 @@ Aplicación educativa para inspeccionar el flujo técnico de agentes de IA sobre
 
 ## Estado
 
-Etapas 1 a 10 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, cloud, CI/CD, contratos deterministas y resiliencia:
+Etapas 1 a 11 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, cloud, CI/CD, contratos deterministas, resiliencia y robustez semántica:
 
 - frontend React + Vite;
 - backend Node.js + Express;
@@ -38,6 +38,10 @@ Etapas 1 a 10 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, 
 - timeout presupuestado, retry transitorio acotado y circuit breaker por instancia caliente;
 - degradación segura que conserva el `answerPayload` grounded si falla sólo la narrativa;
 - evaluación de resiliencia con inyección controlada de fallos.
+- interpretación de español neutro, informal y rioplatense mediante propuesta semántica del LLM;
+- validación backend de capability, schema, período, polaridad y límites antes de MCP;
+- decisiones tipadas de aclaración y consulta no soportada sin acceso a PostgreSQL;
+- benchmark lingüístico versionado con baseline before/after y estabilidad entre ejecuciones repetidas.
 
 La aplicación está desplegada con frontend estático en Render, backend serverless en Vercel y PostgreSQL en Neon. GitHub Actions aplica quality gates y smoke tests contra producción.
 
@@ -225,9 +229,13 @@ Content-Type: application/json
 
 La respuesta contiene `answer`, `model`, `grounded`, `toolsUsed` y una secuencia de eventos técnicos sanitizados. No incluye tokens, credenciales ni razonamiento interno.
 
-## Capability routing y presentación determinista
+## Robustez semántica, routing validado y presentación determinista
 
-Antes de llamar al modelo, un router TypeScript normaliza la pregunta y la compara con una matriz explícita de capacidades. Cada intención soportada reduce el catálogo entregado al LLM a una única herramienta MCP de mínimo alcance:
+El LLM recibe las siete capabilities controladas y propone exactamente una decisión. El backend no confía en esa propuesta: valida allowlist, schema Zod, período expresado por el usuario, polaridad y límites de negocio antes de permitir una llamada MCP:
+
+```text
+LLM propone → backend valida → MCP ejecuta → PostgreSQL → payload determinista
+```
 
 | Capacidad                              | Herramienta                            |
 | -------------------------------------- | -------------------------------------- |
@@ -239,14 +247,16 @@ Antes de llamar al modelo, un router TypeScript normaliza la pregunta y la compa
 | consultar quién no tuvo llegadas tarde | `list_employees_without_late_arrivals` |
 | consultar ausencias por período        | `list_absences`                        |
 
-Una pregunta fuera de esta matriz se rechaza antes de consumir inferencia con HTTP `422` y `unsupported_agent_query`. El catálogo público se consulta en `GET /api/agent/capabilities` y también aparece en el System index.
+Además de las siete tools MCP, la planificación dispone de dos decisiones internas que nunca llegan a MCP: `request_clarification` y `reject_unsupported_query`. La primera devuelve `agent_clarification_required` cuando falta un período o existe ambigüedad; la segunda devuelve `unsupported_agent_query` cuando el pedido exige una capability, ranking, frecuencia o filtro inexistente. El catálogo público se consulta en `GET /api/agent/capabilities` y también aparece en el System index.
+
+Las expresiones informales se interpretan por significado. Por ejemplo, llegar, entrar, caer, fichar o marcar tarde pueden referirse a `late_arrivals`; “sin tardanzas” y “siempre puntual” se interpretan como cero eventos sólo dentro de un período explícito. Expresiones como “banda”, “una bocha”, “siempre” o “seguido” nunca se convierten en cantidades inventadas.
 
 Después de ejecutar MCP, `AnswerPresentation` valida el `structuredContent` mediante una unión discriminada de Zod. La API devuelve dos superficies separadas:
 
 - `presentation`: `answerPayload` tipado, determinista y renderizado por un componente React específico;
 - `answer`: narrativa grounded generada por el LLM, visible en un panel secundario identificado como no determinista.
 
-Las cantidades, tablas, fechas, estados vacíos y metadatos de fuente se muestran desde `presentation`; no se extraen del texto del modelo. La traza incorpora `agent.capability.routed` y `presentation.payload.validated` para hacer visibles ambas decisiones técnicas.
+Las cantidades, tablas, fechas, estados vacíos y metadatos de fuente se muestran desde `presentation`; no se extraen del texto del modelo. La Etapa 11 no modifica este contrato de la Etapa 9. La traza incorpora `llm.semantic_proposal.completed`, `agent.semantic_decision.validated` y `presentation.payload.validated` para separar propuesta, validación y representación determinista.
 
 La consulta negada se implementa como diferencia de conjuntos: empleados activos menos empleados con al menos una llegada tarde dentro del período. PostgreSQL ejecuta esa semántica mediante `NOT EXISTS`; el LLM no calcula el complemento. Si Groq devuelve una respuesta final vacía o intenta una segunda tool call durante la finalización, el adaptador realiza un único reintento textual con los mismos datos grounded. El evento `llm.grounded_response.completed` informa `recovery=not_required`, el tipo de retry aplicado o el fallback a la presentación determinista.
 
@@ -346,6 +356,7 @@ Casos implementados:
 - `unknown-employee`: exige resultado PostgreSQL vacío y una respuesta explícita sin datos inventados;
 - `source-of-truth-freshness`: inserta un empleado temporal único y una llegada tarde, consulta el registro recién creado y comprueba que el agente observa la actualización.
 - `finalization-failure-degradation`: inyecta un fallo controlado después de MCP y comprueba que el payload PostgreSQL continúa disponible.
+- `semantic-robustness-v1`: ejecuta 80 formulaciones neutrales, formales, informales, rioplatenses y de frontera; mide intención, decisión, argumentos, temporalidad, ambigüedad y estabilidad.
 
 La fixture dinámica usa el rol administrativo sólo durante la preparación y limpieza. La consulta del agente continúa usando el rol read-only. Un bloque `finally` elimina por UUID y número de empleado exactos; al finalizar, una consulta adicional exige que no existan empleados `EVAL-%` ni asistencias con fuente `agent-evaluation`.
 
@@ -354,9 +365,13 @@ Ejecución real con el proveedor LLM configurado, MCP y Neon:
 ```bash
 npm run evals:run
 npm run resilience:eval
+npm run semantic:eval
+npm run semantic:stability
 ```
 
-El comando devuelve un JSON reproducible con `passRate`, duración, checks esperados/reales y evidencia grounded por caso. Finaliza con código distinto de cero si falla una evaluación o si queda alguna fixture temporal. El caso de referencia presupone que el seed de demostración está presente.
+`semantic:eval` recorre una vez los 80 casos y `semantic:stability` repite cinco veces el conjunto crítico. Ambos informan `validDecisionRate`, `intentRecognitionRate`, `toolSelectionRate`, `argumentExtractionRate`, `temporalInterpretationRate`, `exactOutcomeRate`, `stabilityRate`, `ambiguityPassRate` y `unsupportedPassRate`. Por defecto esperan 30 segundos entre llamadas para respetar el presupuesto gratuito de tokens de Groq y separar límites del proveedor de inestabilidad semántica. El baseline Stage 10 se conserva en `backend/evals/baselines/` y los resultados Stage 11 en `backend/evals/results/`.
+
+Los demás comandos devuelven JSON reproducible con `passRate`, duración, checks esperados/reales y evidencia grounded por caso. Finalizan con código distinto de cero si falla una evaluación o si queda alguna fixture temporal. El caso de referencia presupone que el seed de demostración está presente.
 
 ## Deployment cloud
 

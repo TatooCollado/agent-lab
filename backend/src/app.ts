@@ -8,6 +8,8 @@ import { agentAnswerSchema, agentQuerySchema } from "./agent/contracts.js";
 import { createDefaultAgent } from "./agent/factory.js";
 import {
   AGENT_CAPABILITIES,
+  AgentClarificationRequiredError,
+  InvalidAgentDecisionError,
   UnsupportedAgentQueryError,
 } from "./agent/capability-router.js";
 import type { AgentRunner } from "./agent/orchestrator.js";
@@ -87,7 +89,7 @@ export function createApp(
 
   app.get("/api/system", (_req, res) => {
     res.json({
-      stage: 10,
+      stage: 11,
       timezone: env.APP_TIMEZONE,
       components: [
         "React",
@@ -123,7 +125,10 @@ export function createApp(
         "HTTP security headers",
         "Rate limiting",
         "Trace Contract",
-        "Deterministic capability routing",
+        "LLM semantic proposal",
+        "Backend semantic decision validation",
+        "Typed clarification and unsupported outcomes",
+        "Repeated-run semantic stability benchmark",
         "Typed answer presentation payloads",
         "SQL set complement with NOT EXISTS",
         "Bounded LLM finalization retry",
@@ -368,7 +373,26 @@ export function createApp(
           res.status(422).json({
             error: error.code,
             requestId: res.locals.requestId,
+            reason: error.reason,
+            candidateCapability: error.candidateCapability,
             supportedCapabilities: error.supportedCapabilities,
+          });
+          return;
+        }
+        if (error instanceof AgentClarificationRequiredError) {
+          res.status(422).json({
+            error: error.code,
+            requestId: res.locals.requestId,
+            reason: error.reason,
+            candidateCapability: error.candidateCapability,
+            clarification: error.clarification,
+          });
+          return;
+        }
+        if (error instanceof InvalidAgentDecisionError) {
+          res.status(502).json({
+            error: error.code,
+            requestId: res.locals.requestId,
           });
           return;
         }

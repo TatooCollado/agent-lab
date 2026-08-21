@@ -1,17 +1,15 @@
 import { performance } from "node:perf_hooks";
 import { randomUUID } from "node:crypto";
 import type { TraceEvent } from "../observability/trace-event.js";
-import type {
-  AgentAnswer,
-  AgentLlm,
-  AgentToolCall,
-  AgentToolOutput,
-} from "./contracts.js";
+import type { AgentAnswer, AgentLlm, AgentToolOutput } from "./contracts.js";
 import type { McpGateway } from "./mcp-gateway.js";
 import { createAnswerPresentation } from "./answer-presentation.js";
-import { routeAgentCapability } from "./capability-router.js";
+import {
+  semanticPlanningTools,
+  validateAgentDecision,
+} from "./capability-router.js";
 import { HR_AGENT_SYSTEM_PROMPT } from "./system-prompt.js";
-import { CONTROLLED_TOOL_CATALOG, controlledTools } from "./tool-catalog.js";
+import { controlledTools } from "./tool-catalog.js";
 import { ProviderResilienceError } from "../resilience/provider-resilience.js";
 
 export interface AgentRunner {
@@ -33,22 +31,6 @@ function event(
     timestamp: new Date().toISOString(),
     ...value,
   };
-}
-
-function validateCalls(
-  calls: AgentToolCall[],
-  allowedToolNames: Set<string>,
-): void {
-  if (calls.length !== 1) {
-    throw new Error(`Expected exactly one tool call, received ${calls.length}`);
-  }
-  const call = calls[0]!;
-  if (
-    !CONTROLLED_TOOL_CATALOG.has(call.name) ||
-    !allowedToolNames.has(call.name)
-  ) {
-    throw new Error(`Model selected an unapproved tool: ${call.name}`);
-  }
 }
 
 export class HrAgentOrchestrator implements AgentRunner {
@@ -110,42 +92,49 @@ export class HrAgentOrchestrator implements AgentRunner {
         }),
       );
 
-      const routed = routeAgentCapability(question, controlled);
-      const tools = routed.tools;
-      trace.push(
-        event(requestId, {
-          category: "guardrail",
-          name: "agent.capability.routed",
-          status: "completed",
-          technology: "Deterministic TypeScript router",
-          component: "AgentCapabilityCatalog",
-          concepts: ["Capability routing", "Least capability"],
-          input: { questionLength: question.length },
-          output: {
-            capability: routed.capability.id,
-            allowedTools: tools.map((tool) => tool.name),
-          },
-        }),
-      );
-
       startedAt = performance.now();
+      const planningTools = semanticPlanningTools(controlled);
       const plan = await this.llm.plan({
         question,
         instructions: HR_AGENT_SYSTEM_PROMPT,
-        tools,
+        tools: planningTools,
       });
-      validateCalls(plan.calls, new Set(tools.map((tool) => tool.name)));
       trace.push(
         event(requestId, {
           category: "llm",
-          name: "llm.tool_selection.completed",
+          name: "llm.semantic_proposal.completed",
           status: "completed",
           technology: "LLM Tool Calling API",
           component: plan.model,
-          concepts: ["LLM", "System Prompt", "Tool Calling"],
-          input: { toolChoice: "required", parallelToolCalls: false },
+          concepts: ["Semantic interpretation", "Tool calling"],
+          input: { candidates: planningTools.map((tool) => tool.name) },
           output: {
-            calls: plan.calls.map((call) => ({
+            proposals: plan.calls.map((call) => ({
+              name: call.name,
+              arguments: call.arguments,
+            })),
+          },
+          durationMs: elapsed(startedAt),
+        }),
+      );
+      startedAt = performance.now();
+      const decision = validateAgentDecision(question, plan.calls, controlled);
+      const calls = [decision.call];
+      trace.push(
+        event(requestId, {
+          category: "guardrail",
+          name: "agent.semantic_decision.validated",
+          status: "completed",
+          technology: "LLM proposal + Zod backend validation",
+          component: "SemanticDecisionValidator",
+          concepts: ["Semantic routing", "Backend validation", "Allowlist"],
+          input: {
+            proposed: plan.calls.map((call) => call.name),
+            availableMcpTools: controlled.map((tool) => tool.name),
+          },
+          output: {
+            capability: decision.capability.id,
+            calls: calls.map((call) => ({
               name: call.name,
               arguments: call.arguments,
             })),
@@ -155,7 +144,7 @@ export class HrAgentOrchestrator implements AgentRunner {
       );
 
       const toolOutputs: AgentToolOutput[] = [];
-      for (const call of plan.calls) {
+      for (const call of calls) {
         startedAt = performance.now();
         const output = await gateway.callTool(call.name, call.arguments);
         toolOutputs.push({ callId: call.callId, name: call.name, output });
@@ -203,6 +192,7 @@ export class HrAgentOrchestrator implements AgentRunner {
             sources: toolOutputs.map((item) => item.output.source),
             resultCounts: toolOutputs.map((item) => item.output.count),
           },
+          durationMs: elapsed(startedAt),
         }),
       );
 
@@ -213,7 +203,7 @@ export class HrAgentOrchestrator implements AgentRunner {
         final = await this.llm.respond({
           question,
           instructions: HR_AGENT_SYSTEM_PROMPT,
-          tools,
+          tools: planningTools,
           plan,
           toolOutputs,
         });

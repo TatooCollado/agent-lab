@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "semantic-benchmark-v1",
+  "sourceCommit": "fbfb4751281655e9aceba6ec0dc0da73507dfc9d",
+  "architecture": "stage10-deterministic-regex-router",
+  "capturedAt": "2026-08-21T03:58:00-03:00",
+  "summary": {
+    "total": 80,
+    "correct": 23,
+    "accuracy": 0.2875,
+    "ambiguityClarifications": 0
+  },
+  "byCapability": {
+    "employee_count": {
+      "total": 10,
+      "correct": 2
+    },
+    "employee_directory": {
+      "total": 10,
+      "correct": 4
+    },
+    "employee_search": {
+      "total": 10,
+      "correct": 5
+    },
+    "late_arrivals": {
+      "total": 10,
+      "correct": 2
+    },
+    "employees_without_late_arrivals": {
+      "total": 10,
+      "correct": 3
+    },
+    "employee_delay_summary": {
+      "total": 10,
+      "correct": 4
+    },
+    "absences": {
+      "total": 10,
+      "correct": 3
+    },
+    "boundary": {
+      "total": 10,
+      "correct": 0
+    }
+  },
+  "results": [
+    {
+      "id": "employee-count-1",
+      "actual": "employee_count",
+      "correct": true
+    },
+    {
+      "id": "employee-count-2",
+      "actual": "employee_count",
+      "correct": true
+    },
+    {
+      "id": "employee-count-3",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-count-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-count-5",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-count-6",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-count-7",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-count-8",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-count-9",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-count-10",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-directory-1",
+      "actual": "employee_directory",
+      "correct": true
+    },
+    {
+      "id": "employee-directory-2",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-directory-3",
+      "actual": "employee_directory",
+      "correct": true
+    },
+    {
+      "id": "employee-directory-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-directory-5",
+      "actual": "employee_directory",
+      "correct": true
+    },
+    {
+      "id": "employee-directory-6",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-directory-7",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-directory-8",
+      "actual": "employee_directory",
+      "correct": true
+    },
+    {
+      "id": "employee-directory-9",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-directory-10",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-search-1",
+      "actual": "employee_search",
+      "correct": true
+    },
+    {
+      "id": "employee-search-2",
+      "actual": "employee_search",
+      "correct": true
+    },
+    {
+      "id": "employee-search-3",
+      "actual": "employee_search",
+      "correct": true
+    },
+    {
+      "id": "employee-search-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-search-5",
+      "actual": "employee_search",
+      "correct": true
+    },
+    {
+      "id": "employee-search-6",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-search-7",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-search-8",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "employee-search-9",
+      "actual": "employee_search",
+      "correct": true
+    },
+    {
+      "id": "employee-search-10",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-1",
+      "actual": "late_arrivals",
+      "correct": true
+    },
+    {
+      "id": "late-arrivals-2",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-3",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-5",
+      "actual": "late_arrivals",
+      "correct": true
+    },
+    {
+      "id": "late-arrivals-6",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-7",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-8",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-9",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "late-arrivals-10",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "without-late-arrivals-1",
+      "actual": "employees_without_late_arrivals",
+      "correct": true
+    },
+    {
+      "id": "without-late-arrivals-2",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "without-late-arrivals-3",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "without-late-arrivals-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "without-late-arrivals-5",
+      "actual": "employees_without_late_arrivals",
+      "correct": true
+    },
+    {
+      "id": "without-late-arrivals-6",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "without-late-arrivals-7",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "without-late-arrivals-8",
+      "actual": "employees_without_late_arrivals",
+      "correct": true
+    },
+    {
+      "id": "without-late-arrivals-9",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "without-late-arrivals-10",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "delay-summary-1",
+      "actual": "employee_delay_summary",
+      "correct": true
+    },
+    {
+      "id": "delay-summary-2",
+      "actual": "employee_delay_summary",
+      "correct": true
+    },
+    {
+      "id": "delay-summary-3",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "delay-summary-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "delay-summary-5",
+      "actual": "employee_delay_summary",
+      "correct": true
+    },
+    {
+      "id": "delay-summary-6",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "delay-summary-7",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "delay-summary-8",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "delay-summary-9",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "delay-summary-10",
+      "actual": "employee_delay_summary",
+      "correct": true
+    },
+    {
+      "id": "absences-1",
+      "actual": "absences",
+      "correct": true
+    },
+    {
+      "id": "absences-2",
+      "actual": "absences",
+      "correct": true
+    },
+    {
+      "id": "absences-3",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "absences-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "absences-5",
+      "actual": "absences",
+      "correct": true
+    },
+    {
+      "id": "absences-6",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "absences-7",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "absences-8",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "absences-9",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "absences-10",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "boundary-1",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "boundary-2",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "boundary-3",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "boundary-4",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "boundary-5",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "boundary-6",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "boundary-7",
+      "actual": "late_arrivals",
+      "correct": false
+    },
+    {
+      "id": "boundary-8",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "boundary-9",
+      "actual": "unsupported",
+      "correct": false
+    },
+    {
+      "id": "boundary-10",
+      "actual": "absences",
+      "correct": false
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import type {
   AgentLlm,
   AgentPlan,
   AgentToolDefinition,
-  AgentToolOutput
+  AgentToolOutput,
 } from "./contracts.js";
 import { StdioMcpGateway } from "./mcp-gateway.js";
 import { HrAgentOrchestrator } from "./orchestrator.js";
@@ -25,11 +25,11 @@ class DeterministicSmokeLlm implements AgentLlm {
           name: "list_late_arrivals",
           arguments: {
             period: "previous_calendar_month",
-            employeeNumber: null
-          }
-        }
+            employeeNumber: null,
+          },
+        },
       ],
-      continuation: []
+      continuation: [],
     };
   }
 
@@ -37,24 +37,34 @@ class DeterministicSmokeLlm implements AgentLlm {
     const count = input.toolOutputs[0]?.output.count;
     return {
       answer: `PostgreSQL returned ${String(count)} late arrivals.`,
-      model: "deterministic-smoke-double"
+      model: "deterministic-smoke-double",
     };
   }
 }
 
 const agent = new HrAgentOrchestrator(
   new DeterministicSmokeLlm(),
-  () => new StdioMcpGateway()
+  () => new StdioMcpGateway(),
 );
 const result = await agent.run(
   "¿Qué empleados llegaron tarde durante el último mes?",
-  randomUUID()
+  randomUUID(),
 );
 
-const mcpEvent = result.trace.find((item) => item.name === "mcp.tool.call.completed");
+const mcpEvent = result.trace.find(
+  (item) => item.name === "mcp.tool.call.completed",
+);
 const output = mcpEvent?.output as Record<string, unknown> | undefined;
 if (output?.source !== "postgresql" || output.count !== 2) {
-  throw new Error("Expected two seeded late arrivals from PostgreSQL through MCP");
+  throw new Error(
+    "Expected two seeded late arrivals from PostgreSQL through MCP",
+  );
+}
+if (
+  result.presentation.kind !== "late_arrivals" ||
+  result.presentation.data.count !== 2
+) {
+  throw new Error("Stage 9 deterministic presentation regression");
 }
 
 console.info(
@@ -64,6 +74,7 @@ console.info(
     llm: "deterministic test double",
     tool: result.toolsUsed[0],
     count: output.count,
-    traceEvents: result.trace.length
-  })
+    presentation: result.presentation.kind,
+    traceEvents: result.trace.length,
+  }),
 );

@@ -562,6 +562,17 @@ pre {
 .capability-matrix .index-heading p {
   margin: 0;
 }
+.semantic-contract {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.semantic-contract strong {
+  color: var(--text);
+}
 .agent-answer dl {
   display: flex;
   flex-wrap: wrap;

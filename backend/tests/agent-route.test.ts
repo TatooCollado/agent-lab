@@ -2,7 +2,10 @@ import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
 import { createApp } from "../src/app.js";
 import type { AgentRunner } from "../src/agent/orchestrator.js";
-import { UnsupportedAgentQueryError } from "../src/agent/capability-router.js";
+import {
+  AgentClarificationRequiredError,
+  UnsupportedAgentQueryError,
+} from "../src/agent/capability-router.js";
 import { ProviderResilienceError } from "../src/resilience/provider-resilience.js";
 import type { AuthService } from "../src/auth/service.js";
 
@@ -122,6 +125,31 @@ describe("POST /api/agent/query", () => {
         "employee_count",
         "employee_directory",
       ]),
+    });
+  });
+
+  it("returns a typed clarification without pretending that a tool ran", async () => {
+    const agent: AgentRunner = {
+      run: vi
+        .fn()
+        .mockRejectedValue(
+          new AgentClarificationRequiredError(
+            "missing_period",
+            "late_arrivals",
+          ),
+        ),
+    };
+    const response = await request(createApp({ agent, auth }))
+      .post("/api/agent/query")
+      .set("cookie", "agent_lab_session=test-token")
+      .send({ question: "¿Quién cayó tarde?" });
+
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({
+      error: "agent_clarification_required",
+      reason: "missing_period",
+      candidateCapability: "late_arrivals",
+      clarification: expect.stringMatching(/período/i),
     });
   });
 

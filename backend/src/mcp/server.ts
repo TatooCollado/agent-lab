@@ -64,7 +64,7 @@ export function createHrMcpServer(
     {
       title: "Contar empleados",
       description:
-        "Cuenta todos los empleados en PostgreSQL y separa activos e inactivos.",
+        "Cuenta la dotación completa en PostgreSQL y separa empleados activos e inactivos; no lista personas.",
       inputSchema: countEmployeesInputSchema,
       outputSchema: countEmployeesOutputSchema,
       annotations: readOnlyAnnotations,
@@ -77,7 +77,7 @@ export function createHrMcpServer(
     {
       title: "Listar empleados",
       description:
-        "Lista el directorio completo de empleados desde PostgreSQL con legajo, nombre, departamento y estado.",
+        "Lista la nómina o directorio completo desde PostgreSQL con legajo, nombre, departamento y estado.",
       inputSchema: listEmployeesInputSchema,
       outputSchema: listEmployeesOutputSchema,
       annotations: readOnlyAnnotations,
@@ -103,7 +103,7 @@ export function createHrMcpServer(
     {
       title: "Resumir demoras de un empleado",
       description:
-        "Agrega todas las llegadas tarde registradas para un nombre o número de empleado y calcula ocurrencias, minutos totales, promedio y máximo.",
+        "Agrega el historial completo de tardanzas de una persona por nombre o legajo y calcula ocurrencias, minutos totales, promedio y máximo; no compara personas ni filtra por período.",
       inputSchema: summarizeEmployeeDelaysInputSchema,
       outputSchema: summarizeEmployeeDelaysOutputSchema,
       annotations: readOnlyAnnotations,
@@ -116,7 +116,7 @@ export function createHrMcpServer(
     {
       title: "Listar llegadas tarde",
       description:
-        "Consulta llegadas tarde en PostgreSQL para un período calendario y empleado opcional.",
+        "Consulta eventos de ingreso posterior al horario esperado en un período calendario explícito y por legajo opcional.",
       inputSchema: periodInputSchema,
       outputSchema: lateArrivalsOutputSchema,
       annotations: readOnlyAnnotations,
@@ -129,7 +129,7 @@ export function createHrMcpServer(
     {
       title: "Listar empleados sin llegadas tarde",
       description:
-        "Lista empleados activos que no registraron ninguna llegada tarde durante el período solicitado.",
+        "Lista empleados activos con cero llegadas tarde dentro del período explícito solicitado.",
       inputSchema: periodOnlyInputSchema,
       outputSchema: employeesWithoutLateArrivalsOutputSchema,
       annotations: readOnlyAnnotations,
@@ -143,7 +143,7 @@ export function createHrMcpServer(
     {
       title: "Listar ausencias",
       description:
-        "Consulta ausencias en PostgreSQL para un período calendario y empleado opcional.",
+        "Consulta eventos de ausencia o inasistencia laboral en un período calendario explícito y por legajo opcional.",
       inputSchema: periodInputSchema,
       outputSchema: absencesOutputSchema,
       annotations: readOnlyAnnotations,

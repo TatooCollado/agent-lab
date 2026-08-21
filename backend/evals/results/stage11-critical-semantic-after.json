@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "semantic-benchmark-v1-critical",
+  "status": "complete",
+  "semanticMetricsValid": true,
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "generatedAt": "2026-08-21T07:13:16.976Z",
+  "repetitions": 2,
+  "metrics": {
+    "cases": 5,
+    "observations": 10,
+    "validDecisionRate": 1,
+    "intentRecognitionRate": 1,
+    "exactOutcomeRate": 1,
+    "stabilityRate": 1,
+    "casePassRate": 1,
+    "ambiguityPassRate": 1,
+    "unsupportedPassRate": 1
+  },
+  "cases": [
+    {
+      "id": "late-arrivals-4",
+      "question": "¿Quién cayó tarde el mes pasado?",
+      "outcome": "list_late_arrivals/previous_calendar_month",
+      "stable": true
+    },
+    {
+      "id": "late-arrivals-9",
+      "question": "¿Quién marcó tarde?",
+      "outcome": "clarification/missing_period",
+      "stable": true
+    },
+    {
+      "id": "late-arrivals-10",
+      "question": "¿Quién llega siempre tarde este mes?",
+      "outcome": "unsupported/unsupported_frequency_claim",
+      "stable": true
+    },
+    {
+      "id": "without-late-arrivals-5",
+      "question": "Sin tardanzas este mes.",
+      "outcome": "list_employees_without_late_arrivals/current_month",
+      "stable": true
+    },
+    {
+      "id": "boundary-1",
+      "question": "¿Quiénes tuvieron demoras?",
+      "outcome": "clarification/ambiguous_intent",
+      "stable": true
+    }
+  ]
+}

@@ -115,6 +115,7 @@ export class AgentQueryError extends Error {
   constructor(
     public readonly code: string,
     public readonly requestId?: string,
+    public readonly clarification?: string,
   ) {
     super(code);
   }
@@ -140,7 +141,11 @@ export async function runAgentQuery(
       typeof body === "object" && body !== null && "requestId" in body
         ? String(body.requestId)
         : undefined;
-    throw new AgentQueryError(code, requestId);
+    const clarification =
+      typeof body === "object" && body !== null && "clarification" in body
+        ? String(body.clarification)
+        : undefined;
+    throw new AgentQueryError(code, requestId, clarification);
   }
 
   return (await response.json()) as AgentQueryResponse;

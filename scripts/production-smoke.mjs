@@ -21,11 +21,15 @@ assert.equal(directHealth.status, "ok");
 assert.equal(directHealth.service, "agent-lab-backend");
 
 const system = await (await request("/api/system")).json();
-assert.equal(system.stage, 10);
+assert.equal(system.stage, 11);
 assert.deepEqual(system.pending, []);
 assert.ok(system.components.includes("GitHub Actions"));
 assert.ok(system.components.includes("Deployment smoke tests"));
-assert.ok(system.components.includes("Deterministic capability routing"));
+assert.ok(system.components.includes("LLM semantic proposal"));
+assert.ok(system.components.includes("Backend semantic decision validation"));
+assert.ok(
+  system.components.includes("Repeated-run semantic stability benchmark"),
+);
 assert.ok(system.components.includes("Typed answer presentation payloads"));
 assert.ok(system.components.includes("SQL set complement with NOT EXISTS"));
 assert.ok(system.components.includes("Bounded LLM finalization retry"));

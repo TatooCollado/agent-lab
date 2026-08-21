@@ -91,7 +91,14 @@ class FakeLlm implements AgentLlm {
     tools: AgentToolDefinition[];
   }): Promise<AgentPlan> {
     this.planInput = input;
-    const selected = input.tools[0]!;
+    const selectedName = input.question.includes("temperatura")
+      ? "reject_unsupported_query"
+      : input.question.includes("no llegó tarde")
+        ? "list_employees_without_late_arrivals"
+        : input.question.includes("llegó tarde")
+          ? "list_late_arrivals"
+          : "find_employee";
+    const selected = input.tools.find((tool) => tool.name === selectedName)!;
     return {
       model: "fake-model",
       calls: [
@@ -99,13 +106,15 @@ class FakeLlm implements AgentLlm {
           callId: "call-1",
           name: selected.name,
           arguments:
-            selected.name === "find_employee"
-              ? { query: "Inexistente" }
-              : selected.name === "list_late_arrivals"
-                ? { period: "previous_calendar_month", employeeNumber: null }
-                : selected.name === "list_employees_without_late_arrivals"
-                  ? { period: "previous_calendar_month" }
-                  : {},
+            selected.name === "reject_unsupported_query"
+              ? { reason: "unsupported_capability", candidateCapability: null }
+              : selected.name === "find_employee"
+                ? { query: "Inexistente" }
+                : selected.name === "list_late_arrivals"
+                  ? { period: "previous_calendar_month", employeeNumber: null }
+                  : selected.name === "list_employees_without_late_arrivals"
+                    ? { period: "previous_calendar_month" }
+                    : {},
         },
       ],
       continuation: [],
@@ -148,8 +157,8 @@ describe("HrAgentOrchestrator", () => {
       "agent.request.validated",
       "mcp.tools.discovered",
       "agent.tools.allowlist.validated",
-      "agent.capability.routed",
-      "llm.tool_selection.completed",
+      "llm.semantic_proposal.completed",
+      "agent.semantic_decision.validated",
       "mcp.tool.call.completed",
       "database.source.read",
       "grounding.context.assembled",
@@ -170,8 +179,13 @@ describe("HrAgentOrchestrator", () => {
 
     await agent.run("¿Quién llegó tarde el mes pasado?", requestId);
 
-    expect(llm.planInput?.tools).toHaveLength(1);
-    expect(llm.planInput?.tools[0]?.name).toBe("list_late_arrivals");
+    expect(llm.planInput?.tools).toHaveLength(9);
+    expect(llm.planInput?.tools.map((tool) => tool.name)).toContain(
+      "list_late_arrivals",
+    );
+    expect(llm.planInput?.tools.map((tool) => tool.name)).toContain(
+      "request_clarification",
+    );
     expect(llm.planInput?.tools.every((tool) => tool.strict)).toBe(true);
     expect(llm.planInput?.instructions).toMatch(/exclusivamente/i);
     expect(llm.planInput?.instructions).toMatch(/count igual a 0/i);
@@ -250,7 +264,10 @@ describe("HrAgentOrchestrator", () => {
     await expect(
       agent.run("¿Qué temperatura hace en Córdoba?", requestId),
     ).rejects.toThrow(/supported agent capability/i);
-    expect(llm.planInput).toBeUndefined();
+    expect(llm.planInput?.tools.map((tool) => tool.name)).toContain(
+      "reject_unsupported_query",
+    );
+    expect(gateway.calls).toHaveLength(0);
     expect(gateway.closed).toBe(true);
   });
 });

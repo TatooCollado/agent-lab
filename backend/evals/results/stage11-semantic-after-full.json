@@ -1,0 +1,2202 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "semantic-benchmark-v1",
+  "status": "inconclusive_provider_rate_limit",
+  "semanticMetricsValid": false,
+  "note": "Groq completed 11 observations and returned llm_rate_limited for the remaining 69. This run is retained as provider evidence and must not be interpreted as semantic accuracy.",
+  "repetitions": 1,
+  "generatedAt": "2026-08-21T07:30:22.690Z",
+  "metrics": {
+    "cases": 80,
+    "observations": 80,
+    "validDecisionRate": 0.1375,
+    "providerOrDecisionFailureRate": 0.8625,
+    "intentRecognitionRate": 0.1375,
+    "exactOutcomeRate": 0.1375,
+    "stabilityRate": 1,
+    "casePassRate": 0.1375,
+    "executionPassRate": 0.1746,
+    "ambiguityPassRate": 0,
+    "unsupportedPassRate": 0
+  },
+  "results": [
+    {
+      "id": "employee-count-1",
+      "capability": "employee_count",
+      "variant": "neutral",
+      "question": "¿Cuántos empleados hay?",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-2",
+      "capability": "employee_count",
+      "variant": "formal",
+      "question": "Informe la cantidad total de empleados.",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-3",
+      "capability": "employee_count",
+      "variant": "informal",
+      "question": "¿Cuánta gente trabaja acá?",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-4",
+      "capability": "employee_count",
+      "variant": "rioplatense",
+      "question": "¿Cuántos somos laburando acá?",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-5",
+      "capability": "employee_count",
+      "variant": "short",
+      "question": "Total de personal.",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-6",
+      "capability": "employee_count",
+      "variant": "indirect",
+      "question": "Quiero saber el tamaño de la plantilla.",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-7",
+      "capability": "employee_count",
+      "variant": "synonym",
+      "question": "Pasame el headcount.",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-8",
+      "capability": "employee_count",
+      "variant": "active-inactive",
+      "question": "¿Cuál es la dotación activa e inactiva?",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-9",
+      "capability": "employee_count",
+      "variant": "question",
+      "question": "¿Qué cantidad de gente tiene la empresa?",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-count-10",
+      "capability": "employee_count",
+      "variant": "abbreviated",
+      "question": "Cant. empleados",
+      "expected": {
+        "kind": "execute",
+        "tool": "count_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_count",
+          "outcome": {
+            "kind": "execute",
+            "tool": "count_employees",
+            "arguments": {}
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-1",
+      "capability": "employee_directory",
+      "variant": "neutral",
+      "question": "¿Quiénes son los empleados?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-2",
+      "capability": "employee_directory",
+      "variant": "formal",
+      "question": "Liste el personal registrado.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-3",
+      "capability": "employee_directory",
+      "variant": "informal",
+      "question": "Mostrame la lista de empleados.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-4",
+      "capability": "employee_directory",
+      "variant": "rioplatense",
+      "question": "Pasame la gente que labura acá.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-5",
+      "capability": "employee_directory",
+      "variant": "short",
+      "question": "Nómina.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-6",
+      "capability": "employee_directory",
+      "variant": "indirect",
+      "question": "Quiero saber quién trabaja en la empresa.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-7",
+      "capability": "employee_directory",
+      "variant": "synonym",
+      "question": "Mostrame el plantel completo.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-8",
+      "capability": "employee_directory",
+      "variant": "directory",
+      "question": "Directorio de empleados.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-9",
+      "capability": "employee_directory",
+      "variant": "status",
+      "question": "Listá el personal activo e inactivo.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-directory-10",
+      "capability": "employee_directory",
+      "variant": "abbreviated",
+      "question": "Lista personal",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees",
+        "arguments": {}
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-1",
+      "capability": "employee_search",
+      "variant": "neutral",
+      "question": "Buscá a Ana Torres.",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "Ana Torres"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-2",
+      "capability": "employee_search",
+      "variant": "formal",
+      "question": "Localice al empleado EMP-001.",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "EMP-001"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-3",
+      "capability": "employee_search",
+      "variant": "informal",
+      "question": "Encontrame a Bruno Silva.",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "Bruno Silva"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-4",
+      "capability": "employee_search",
+      "variant": "rioplatense",
+      "question": "Fijate si está Carla Méndez.",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "Carla Méndez"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-5",
+      "capability": "employee_search",
+      "variant": "short",
+      "question": "Buscá EMP-002.",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "EMP-002"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-6",
+      "capability": "employee_search",
+      "variant": "indirect",
+      "question": "Quiero los datos de Ana Torres.",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "Ana Torres"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-7",
+      "capability": "employee_search",
+      "variant": "identity",
+      "question": "¿Quién es EMP-001?",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "EMP-001"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-8",
+      "capability": "employee_search",
+      "variant": "existence",
+      "question": "¿Está registrada Carla Méndez?",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "Carla Méndez"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-9",
+      "capability": "employee_search",
+      "variant": "synonym",
+      "question": "Consultá el legajo EMP-003.",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "EMP-003"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "employee-search-10",
+      "capability": "employee_search",
+      "variant": "abbreviated",
+      "question": "Empleado Bruno Silva",
+      "expected": {
+        "kind": "execute",
+        "tool": "find_employee",
+        "arguments": {
+          "query": "Bruno Silva"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-1",
+      "capability": "late_arrivals",
+      "variant": "neutral",
+      "question": "¿Quién llegó tarde el mes pasado?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "previous_calendar_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-2",
+      "capability": "late_arrivals",
+      "variant": "formal",
+      "question": "Liste los ingresos posteriores al horario previsto este mes.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-3",
+      "capability": "late_arrivals",
+      "variant": "informal",
+      "question": "¿Quién entró tarde este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-4",
+      "capability": "late_arrivals",
+      "variant": "rioplatense",
+      "question": "¿Quién cayó tarde el mes pasado?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "previous_calendar_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-5",
+      "capability": "late_arrivals",
+      "variant": "short",
+      "question": "Tardanzas del mes pasado.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "previous_calendar_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-6",
+      "capability": "late_arrivals",
+      "variant": "indirect",
+      "question": "¿Hubo gente entrando tarde este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-7",
+      "capability": "late_arrivals",
+      "variant": "synonym",
+      "question": "¿Quién llegó después de hora en los últimos 30 días?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "last_30_days",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-8",
+      "capability": "late_arrivals",
+      "variant": "clock",
+      "question": "¿Quién fichó tarde este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_late_arrivals",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-9",
+      "capability": "late_arrivals",
+      "variant": "missing-period",
+      "question": "¿Quién marcó tarde?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "missing_period"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "late-arrivals-10",
+      "capability": "late_arrivals",
+      "variant": "unsupported-frequency",
+      "question": "¿Quién llega siempre tarde este mes?",
+      "expected": {
+        "kind": "unsupported",
+        "reason": "unsupported_frequency_claim"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-1",
+      "capability": "employees_without_late_arrivals",
+      "variant": "neutral",
+      "question": "¿Quién no llegó tarde el mes pasado?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "previous_calendar_month"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-2",
+      "capability": "employees_without_late_arrivals",
+      "variant": "formal",
+      "question": "Liste al personal sin ingresos tardíos este mes.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "current_month"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-3",
+      "capability": "employees_without_late_arrivals",
+      "variant": "informal",
+      "question": "¿Quién entró siempre a horario este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "current_month"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-4",
+      "capability": "employees_without_late_arrivals",
+      "variant": "rioplatense",
+      "question": "¿Quién no cayó tarde el mes pasado?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "previous_calendar_month"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-5",
+      "capability": "employees_without_late_arrivals",
+      "variant": "short",
+      "question": "Sin tardanzas este mes.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "current_month"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-6",
+      "capability": "employees_without_late_arrivals",
+      "variant": "clock",
+      "question": "¿Quién nunca fichó tarde en los últimos 30 días?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "last_30_days"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-7",
+      "capability": "employees_without_late_arrivals",
+      "variant": "synonym",
+      "question": "Los que llegaron en horario el mes pasado.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "previous_calendar_month"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-8",
+      "capability": "employees_without_late_arrivals",
+      "variant": "negative",
+      "question": "¿Quién no tuvo demoras este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_employees_without_late_arrivals",
+        "arguments": {
+          "period": "current_month"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-9",
+      "capability": "employees_without_late_arrivals",
+      "variant": "missing-period",
+      "question": "¿Quién estuvo siempre puntual?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "missing_period"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "without-late-arrivals-10",
+      "capability": "employees_without_late_arrivals",
+      "variant": "universal-history",
+      "question": "¿Quién nunca llegó tarde?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "missing_period"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-1",
+      "capability": "employee_delay_summary",
+      "variant": "neutral",
+      "question": "Pasame las demoras totales de Bruno Silva.",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "Bruno Silva"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-2",
+      "capability": "employee_delay_summary",
+      "variant": "formal",
+      "question": "Informe la tardanza histórica acumulada de EMP-002.",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "EMP-002"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-3",
+      "capability": "employee_delay_summary",
+      "variant": "informal",
+      "question": "¿Cuánto llegó tarde Bruno Silva en total?",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "Bruno Silva"
+        }
+      },
+      "stable": true,
+      "passed": true,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": "employee_delay_summary",
+          "outcome": {
+            "kind": "execute",
+            "tool": "summarize_employee_delays",
+            "arguments": {
+              "query": "Bruno Silva"
+            }
+          },
+          "validDecision": true,
+          "intentCorrect": true,
+          "outcomeCorrect": true
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-4",
+      "capability": "employee_delay_summary",
+      "variant": "rioplatense",
+      "question": "¿Cuántos minutos tarde juntó Ana Torres?",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "Ana Torres"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-5",
+      "capability": "employee_delay_summary",
+      "variant": "short",
+      "question": "Total de retrasos de Carla Méndez.",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "Carla Méndez"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-6",
+      "capability": "employee_delay_summary",
+      "variant": "maximum",
+      "question": "¿Cuál fue la demora máxima de EMP-001?",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "EMP-001"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-7",
+      "capability": "employee_delay_summary",
+      "variant": "average",
+      "question": "Dame el promedio histórico de tardanza de Bruno Silva.",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "Bruno Silva"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-8",
+      "capability": "employee_delay_summary",
+      "variant": "occurrences",
+      "question": "¿Cuántas veces llegó tarde Ana Torres en total?",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "Ana Torres"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-9",
+      "capability": "employee_delay_summary",
+      "variant": "synonym",
+      "question": "Resumen acumulado de impuntualidad de EMP-003.",
+      "expected": {
+        "kind": "execute",
+        "tool": "summarize_employee_delays",
+        "arguments": {
+          "query": "EMP-003"
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "delay-summary-10",
+      "capability": "employee_delay_summary",
+      "variant": "unsupported-period",
+      "question": "Demoras totales de Bruno Silva este mes.",
+      "expected": {
+        "kind": "unsupported",
+        "reason": "unsupported_filter"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-1",
+      "capability": "absences",
+      "variant": "neutral",
+      "question": "¿Qué ausencias hubo este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-2",
+      "capability": "absences",
+      "variant": "formal",
+      "question": "Liste las inasistencias del mes pasado.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "previous_calendar_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-3",
+      "capability": "absences",
+      "variant": "informal",
+      "question": "¿Quién faltó este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-4",
+      "capability": "absences",
+      "variant": "rioplatense",
+      "question": "¿Quién pegó el faltazo el mes pasado?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "previous_calendar_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-5",
+      "capability": "absences",
+      "variant": "short",
+      "question": "Faltas del mes pasado.",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "previous_calendar_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-6",
+      "capability": "absences",
+      "variant": "indirect",
+      "question": "¿Quién no vino a trabajar este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-7",
+      "capability": "absences",
+      "variant": "synonym",
+      "question": "¿Hubo gente ausente en los últimos 30 días?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "last_30_days",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-8",
+      "capability": "absences",
+      "variant": "progressive",
+      "question": "¿Quién se estuvo ausentando este mes?",
+      "expected": {
+        "kind": "execute",
+        "tool": "list_absences",
+        "arguments": {
+          "period": "current_month",
+          "employeeNumber": null
+        }
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-9",
+      "capability": "absences",
+      "variant": "missing-period",
+      "question": "¿Quién faltó?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "missing_period"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "absences-10",
+      "capability": "absences",
+      "variant": "unsupported-ranking",
+      "question": "¿Quién tiene más faltazos este mes?",
+      "expected": {
+        "kind": "unsupported",
+        "reason": "unsupported_aggregation"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-1",
+      "capability": null,
+      "variant": "ambiguous-delay",
+      "question": "¿Quiénes tuvieron demoras?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "ambiguous_intent"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-2",
+      "capability": null,
+      "variant": "ambiguous-clock",
+      "question": "¿Quién fichó?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "ambiguous_intent"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-3",
+      "capability": null,
+      "variant": "ambiguous-schedule",
+      "question": "¿Quién tiene problemas de horario?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "ambiguous_intent"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-4",
+      "capability": null,
+      "variant": "unsupported-weather",
+      "question": "¿Qué temperatura hace en Córdoba?",
+      "expected": {
+        "kind": "unsupported",
+        "reason": "unsupported_capability"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-5",
+      "capability": null,
+      "variant": "unsupported-payroll",
+      "question": "¿Cuánto cobra Ana Torres?",
+      "expected": {
+        "kind": "unsupported",
+        "reason": "unsupported_capability"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-6",
+      "capability": null,
+      "variant": "conflicting-period",
+      "question": "¿Quién llegó tarde este mes y el mes pasado?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "conflicting_period"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-7",
+      "capability": null,
+      "variant": "ambiguous-delay-kind",
+      "question": "Pasame los retrasos.",
+      "expected": {
+        "kind": "clarification",
+        "reason": "ambiguous_intent"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-8",
+      "capability": null,
+      "variant": "unsupported-ranking",
+      "question": "¿Quién es el más impuntual?",
+      "expected": {
+        "kind": "unsupported",
+        "reason": "unsupported_aggregation"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-9",
+      "capability": null,
+      "variant": "ambiguous-after-hours",
+      "question": "¿Quién estuvo después de hora?",
+      "expected": {
+        "kind": "clarification",
+        "reason": "ambiguous_intent"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "boundary-10",
+      "capability": null,
+      "variant": "unsupported-delete",
+      "question": "Borrá las ausencias de este mes.",
+      "expected": {
+        "kind": "unsupported",
+        "reason": "unsupported_capability"
+      },
+      "stable": true,
+      "passed": false,
+      "observations": [
+        {
+          "repetition": 1,
+          "intent": null,
+          "outcome": {
+            "kind": "invalid",
+            "reason": "llm_rate_limited"
+          },
+          "validDecision": false,
+          "intentCorrect": false,
+          "outcomeCorrect": false
+        }
+      ]
+    }
+  ]
+}

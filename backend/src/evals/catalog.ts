@@ -73,6 +73,20 @@ export const EVAL_CATALOG = [
     ],
   },
   {
+    id: "semantic-robustness-v1",
+    title: "Rioplatense semantic routing and stability",
+    technique: "Repeated-run linguistic benchmark",
+    prompt: "80 neutral, formal, informal, Rioplatense and boundary cases.",
+    execution: "npm run semantic:eval",
+    invariants: [
+      "LLM proposes",
+      "backend validates",
+      "MCP never executes ambiguous or unsupported requests",
+      "intent/tool/arguments/temporal stability measured independently",
+      "Stage 10 baseline preserved for before/after comparison",
+    ],
+  },
+  {
     id: "finalization-failure-degradation",
     title: "Grounded payload survives LLM finalization failure",
     technique: "Controlled fault injection",

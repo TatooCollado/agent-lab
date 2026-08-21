@@ -26,7 +26,9 @@
     "auth:smoke": "tsx src/auth/smoke.ts",
     "a2a:smoke": "tsx src/a2a/smoke.ts",
     "evals:run": "tsx src/evals/cli.ts",
-    "resilience:eval": "tsx src/evals/resilience-cli.ts"
+    "resilience:eval": "tsx src/evals/resilience-cli.ts",
+    "semantic:eval": "tsx src/evals/semantic-cli.ts",
+    "semantic:stability": "tsx src/evals/semantic-cli.ts --profile=critical --repetitions=5"
   },
   "dependencies": {
     "@a2a-js/sdk": "^1.0.1",

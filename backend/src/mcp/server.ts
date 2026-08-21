@@ -8,6 +8,8 @@ import {
   findEmployeeOutputSchema,
   lateArrivalsOutputSchema,
   periodInputSchema,
+  summarizeEmployeeDelaysInputSchema,
+  summarizeEmployeeDelaysOutputSchema,
 } from "./contracts.js";
 import { HrToolService } from "./tool-service.js";
 
@@ -77,6 +79,20 @@ export function createHrMcpServer(
       annotations: readOnlyAnnotations,
     },
     async (input) => executeTool(() => service.findEmployee(input)),
+  );
+
+  server.registerTool(
+    "summarize_employee_delays",
+    {
+      title: "Resumir demoras de un empleado",
+      description:
+        "Agrega todas las llegadas tarde registradas para un nombre o número de empleado y calcula ocurrencias, minutos totales, promedio y máximo.",
+      inputSchema: summarizeEmployeeDelaysInputSchema,
+      outputSchema: summarizeEmployeeDelaysOutputSchema,
+      annotations: readOnlyAnnotations,
+    },
+    async (input) =>
+      executeTool(() => service.summarizeEmployeeDelays(input)),
   );
 
   server.registerTool(

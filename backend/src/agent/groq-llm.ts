@@ -24,6 +24,15 @@ function parseArguments(value: string): Record<string, unknown> {
   return parsed as Record<string, unknown>;
 }
 
+function isMissingRequiredToolCall(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    "status" in error &&
+    error.status === 400 &&
+    /tool choice is required.*did not call a tool/i.test(error.message)
+  );
+}
+
 function asGroqTools(tools: AgentToolDefinition[]): ChatCompletionTool[] {
   return tools.map((tool) => ({
     type: "function",
@@ -54,18 +63,33 @@ export class GroqChatLlm implements AgentLlm {
     instructions: string;
     tools: AgentToolDefinition[];
   }): Promise<AgentPlan> {
-    const messages: ChatCompletionMessageParam[] = [
+    let messages: ChatCompletionMessageParam[] = [
       { role: "system", content: input.instructions },
       { role: "user", content: input.question }
     ];
-    const response = await this.client.chat.completions.create({
-      model: this.model,
-      messages,
-      tools: asGroqTools(input.tools),
-      tool_choice: "required",
-      parallel_tool_calls: false,
-      temperature: 0
-    });
+    const request = () =>
+      this.client.chat.completions.create({
+        model: this.model,
+        messages,
+        tools: asGroqTools(input.tools),
+        tool_choice: "required",
+        parallel_tool_calls: false,
+        temperature: 0
+      });
+    let response;
+    try {
+      response = await request();
+    } catch (error) {
+      if (!isMissingRequiredToolCall(error)) throw error;
+      messages = [
+        {
+          role: "system",
+          content: `${input.instructions}\nLa planificación anterior no llamó una herramienta. En este intento debés seleccionar exactamente una herramienta compatible y devolver sus argumentos estructurados.`
+        },
+        { role: "user", content: input.question }
+      ];
+      response = await request();
+    }
     const message = response.choices[0]?.message;
     if (!message) throw new Error("Groq returned no planning message");
 

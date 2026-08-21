@@ -148,6 +148,7 @@ El servidor utiliza el SDK oficial de Model Context Protocol para exponer:
 
 - `count_employees`: cuenta empleados totales, activos e inactivos;
 - `find_employee`: busca por nombre o número de empleado;
+- `summarize_employee_delays`: agrega las tardanzas históricas de una persona por nombre o legajo;
 - `list_late_arrivals`: lista llegadas tarde por período y empleado opcional;
 - `list_absences`: lista ausencias por período y empleado opcional.
 

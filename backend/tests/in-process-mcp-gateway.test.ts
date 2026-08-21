@@ -8,6 +8,9 @@ describe("InProcessMcpGateway", () => {
       async countEmployees() {
         return { total: 8, active: 7, inactive: 1 };
       },
+      async summarizeEmployeeDelays() {
+        return { records: [], total: 0, truncated: false };
+      },
       async findEmployees() {
         return { records: [], total: 0, truncated: false };
       },
@@ -43,6 +46,7 @@ describe("InProcessMcpGateway", () => {
       await expect(gateway.listToolNames()).resolves.toEqual([
         "count_employees",
         "find_employee",
+        "summarize_employee_delays",
         "list_late_arrivals",
         "list_absences",
       ]);

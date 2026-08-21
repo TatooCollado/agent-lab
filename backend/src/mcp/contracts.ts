@@ -30,6 +30,33 @@ export const countEmployeesOutputSchema = resultMetadataSchema.extend({
   inactive: z.number().int().nonnegative(),
 });
 
+export const summarizeEmployeeDelaysInputSchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .describe("Nombre o número de empleado"),
+});
+
+export const employeeDelaySummaryRecordSchema = z.object({
+  employeeId: z.string().uuid(),
+  employeeNumber: z.string(),
+  fullName: z.string(),
+  departmentCode: z.string(),
+  occurrences: z.number().int().nonnegative(),
+  totalLateMinutes: z.number().int().nonnegative(),
+  averageLateMinutes: z.number().int().nonnegative(),
+  maximumLateMinutes: z.number().int().nonnegative(),
+  firstOccurrenceDate: z.string(),
+  lastOccurrenceDate: z.string(),
+});
+
+export const summarizeEmployeeDelaysOutputSchema = resultMetadataSchema.extend({
+  query: z.string(),
+  records: z.array(employeeDelaySummaryRecordSchema),
+});
+
 export const employeeRecordSchema = z.object({
   employeeId: z.string().uuid(),
   employeeNumber: z.string(),
@@ -87,6 +114,12 @@ export const absencesOutputSchema = resultMetadataSchema.extend({
 
 export type FindEmployeeInput = z.infer<typeof findEmployeeInputSchema>;
 export type CountEmployeesOutput = z.infer<typeof countEmployeesOutputSchema>;
+export type SummarizeEmployeeDelaysInput = z.infer<
+  typeof summarizeEmployeeDelaysInputSchema
+>;
+export type SummarizeEmployeeDelaysOutput = z.infer<
+  typeof summarizeEmployeeDelaysOutputSchema
+>;
 export type PeriodInput = z.infer<typeof periodInputSchema>;
 export type FindEmployeeOutput = z.infer<typeof findEmployeeOutputSchema>;
 export type LateArrivalsOutput = z.infer<typeof lateArrivalsOutputSchema>;

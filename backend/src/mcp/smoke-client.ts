@@ -6,6 +6,7 @@ const expectedTools = [
   "find_employee",
   "list_absences",
   "list_late_arrivals",
+  "summarize_employee_delays",
 ];
 const executable = process.platform === "win32" ? "npx.cmd" : "npx";
 const transport = new StdioClientTransport({
@@ -49,6 +50,23 @@ try {
     throw new Error("Employee count contract failed");
   }
 
+  const employeeDelays = structured(
+    await client.callTool({
+      name: "summarize_employee_delays",
+      arguments: { query: "Bruno Silva" },
+    }),
+  );
+  const delayRecord = Array.isArray(employeeDelays.records)
+    ? (employeeDelays.records[0] as Record<string, unknown> | undefined)
+    : undefined;
+  if (
+    employeeDelays.source !== "postgresql" ||
+    delayRecord?.employeeNumber !== "EMP-002" ||
+    delayRecord.totalLateMinutes !== 42
+  ) {
+    throw new Error("Employee delay summary contract failed");
+  }
+
   const lateArrivals = structured(
     await client.callTool({
       name: "list_late_arrivals",
@@ -84,6 +102,7 @@ try {
       status: "ok",
       tools: names,
       employeeCount: employeeCount.total,
+      brunoTotalLateMinutes: delayRecord.totalLateMinutes,
       previousMonthLateArrivals: lateArrivals.count,
       currentMonthAbsences: absences.count,
       zeroResultSearch: noEmployee.count,

@@ -23,6 +23,7 @@ class FakeGateway implements McpGateway {
     return [
       "count_employees",
       "find_employee",
+      "summarize_employee_delays",
       "list_late_arrivals",
       "list_absences",
     ];
@@ -122,7 +123,7 @@ describe("HrAgentOrchestrator", () => {
 
     await agent.run("¿Quién llegó tarde el mes pasado?", requestId);
 
-    expect(llm.planInput?.tools).toHaveLength(4);
+    expect(llm.planInput?.tools).toHaveLength(5);
     expect(llm.planInput?.tools.every((tool) => tool.strict)).toBe(true);
     expect(llm.planInput?.instructions).toMatch(/exclusivamente/i);
     expect(llm.planInput?.instructions).toMatch(/count igual a 0/i);

@@ -44,8 +44,24 @@ export type EmployeeCount = {
   inactive: number;
 };
 
+export type EmployeeDelaySummaryRecord = {
+  employeeId: string;
+  employeeNumber: string;
+  fullName: string;
+  departmentCode: string;
+  occurrences: number;
+  totalLateMinutes: number;
+  averageLateMinutes: number;
+  maximumLateMinutes: number;
+  firstOccurrenceDate: string;
+  lastOccurrenceDate: string;
+};
+
 export interface HrRepository {
   countEmployees(): Promise<EmployeeCount>;
+  summarizeEmployeeDelays(
+    query: string,
+  ): Promise<LimitedResult<EmployeeDelaySummaryRecord>>;
   findEmployees(query: string): Promise<LimitedResult<EmployeeDirectoryRecord>>;
   listLateArrivals(
     period: DatePeriod,
@@ -94,6 +110,59 @@ export class PostgresHrRepository implements HrRepository {
       active: Number(row?.active ?? 0),
       inactive: Number(row?.inactive ?? 0),
     };
+  }
+
+  async summarizeEmployeeDelays(
+    query: string,
+  ): Promise<LimitedResult<EmployeeDelaySummaryRecord>> {
+    type Row = {
+      employee_id: string;
+      employee_number: string;
+      full_name: string;
+      department_code: string;
+      occurrences: number;
+      total_late_minutes: number;
+      average_late_minutes: number;
+      maximum_late_minutes: number;
+      first_occurrence_date: string;
+      last_occurrence_date: string;
+      total_count: string;
+    };
+
+    const result = await this.pool.query<Row>(
+      `SELECT
+         employee_id,
+         employee_number,
+         full_name,
+         department_code,
+         count(*)::int AS occurrences,
+         sum(late_minutes)::int AS total_late_minutes,
+         round(avg(late_minutes))::int AS average_late_minutes,
+         max(late_minutes)::int AS maximum_late_minutes,
+         to_char(min(work_date), 'YYYY-MM-DD') AS first_occurrence_date,
+         to_char(max(work_date), 'YYYY-MM-DD') AS last_occurrence_date,
+         count(*) OVER ()::text AS total_count
+       FROM hr_late_arrivals
+       WHERE employee_number ILIKE '%' || $1 || '%'
+          OR full_name ILIKE '%' || $1 || '%'
+       GROUP BY employee_id, employee_number, full_name, department_code
+       ORDER BY full_name, employee_number
+       LIMIT $2`,
+      [query, SEARCH_LIMIT],
+    );
+
+    return limitedResult(result.rows, SEARCH_LIMIT, (row) => ({
+      employeeId: row.employee_id,
+      employeeNumber: row.employee_number,
+      fullName: row.full_name,
+      departmentCode: row.department_code,
+      occurrences: row.occurrences,
+      totalLateMinutes: row.total_late_minutes,
+      averageLateMinutes: row.average_late_minutes,
+      maximumLateMinutes: row.maximum_late_minutes,
+      firstOccurrenceDate: row.first_occurrence_date,
+      lastOccurrenceDate: row.last_occurrence_date,
+    }));
   }
 
   async findEmployees(

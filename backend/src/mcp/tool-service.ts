@@ -7,6 +7,8 @@ import type {
   FindEmployeeOutput,
   LateArrivalsOutput,
   PeriodInput,
+  SummarizeEmployeeDelaysInput,
+  SummarizeEmployeeDelaysOutput,
 } from "./contracts.js";
 
 export class HrToolService {
@@ -27,6 +29,22 @@ export class HrToolService {
       truncated: false,
       active: result.active,
       inactive: result.inactive,
+    };
+  }
+
+  async summarizeEmployeeDelays(
+    input: SummarizeEmployeeDelaysInput,
+  ): Promise<SummarizeEmployeeDelaysOutput> {
+    const queriedAt = this.now().toISOString();
+    const result = await this.repository.summarizeEmployeeDelays(input.query);
+    return {
+      source: "postgresql",
+      queriedAt,
+      query: input.query,
+      count: result.records.length,
+      total: result.total,
+      truncated: result.truncated,
+      records: result.records,
     };
   }
 

@@ -64,6 +64,38 @@ if (
   );
 }
 
+const employeeDelayResult = await agent.run(
+  "Pasame las demoras totales de Bruno Silva",
+  randomUUID(),
+);
+const employeeDelayEvent = employeeDelayResult.trace.find(
+  (item) => item.name === "mcp.tool.call.completed",
+);
+const employeeDelayOutput = employeeDelayEvent?.output as
+  | Record<string, unknown>
+  | undefined;
+const employeeDelayRecord = Array.isArray(employeeDelayOutput?.records)
+  ? (employeeDelayOutput.records[0] as Record<string, unknown> | undefined)
+  : undefined;
+if (
+  !employeeDelayResult.grounded ||
+  !employeeDelayResult.toolsUsed.includes("summarize_employee_delays") ||
+  employeeDelayOutput?.source !== "postgresql" ||
+  employeeDelayRecord?.employeeNumber !== "EMP-002" ||
+  employeeDelayRecord.totalLateMinutes !== 42
+) {
+  throw new Error(
+    `Groq employee delay mismatch: ${JSON.stringify({
+      model: employeeDelayResult.model,
+      grounded: employeeDelayResult.grounded,
+      toolsUsed: employeeDelayResult.toolsUsed,
+      source: employeeDelayOutput?.source,
+      employeeNumber: employeeDelayRecord?.employeeNumber,
+      totalLateMinutes: employeeDelayRecord?.totalLateMinutes,
+    })}`,
+  );
+}
+
 console.info(
   JSON.stringify({
     status: "ok",
@@ -83,6 +115,13 @@ console.info(
         databaseCount: employeeCountOutput.count,
         answer: employeeCountResult.answer,
         traceEvents: employeeCountResult.trace.length,
+      },
+      {
+        question: "employee-delay-summary",
+        toolsUsed: employeeDelayResult.toolsUsed,
+        totalLateMinutes: employeeDelayRecord.totalLateMinutes,
+        answer: employeeDelayResult.answer,
+        traceEvents: employeeDelayResult.trace.length,
       },
     ],
   }),

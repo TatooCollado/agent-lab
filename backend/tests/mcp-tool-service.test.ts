@@ -13,6 +13,24 @@ function repository(): HrRepository {
     countEmployees: vi
       .fn()
       .mockResolvedValue({ total: 8, active: 7, inactive: 1 }),
+    summarizeEmployeeDelays: vi.fn().mockResolvedValue({
+      records: [
+        {
+          employeeId: "550e8400-e29b-41d4-a716-446655440000",
+          employeeNumber: "EMP-002",
+          fullName: "Bruno Silva",
+          departmentCode: "OPS",
+          occurrences: 2,
+          totalLateMinutes: 57,
+          averageLateMinutes: 29,
+          maximumLateMinutes: 42,
+          firstOccurrenceDate: "2026-06-10",
+          lastOccurrenceDate: "2026-07-10",
+        },
+      ],
+      total: 1,
+      truncated: false,
+    }),
     findEmployees: vi.fn().mockResolvedValue({
       records: [],
       total: 0,
@@ -60,6 +78,28 @@ describe("HrToolService", () => {
       truncated: false,
       records: [],
     });
+  });
+
+  it("returns a grounded aggregate of an employee's historical delays", async () => {
+    const repo = repository();
+    const service = new HrToolService(repo, timezone, () => fixedNow);
+
+    await expect(
+      service.summarizeEmployeeDelays({ query: "Bruno Silva" }),
+    ).resolves.toMatchObject({
+      source: "postgresql",
+      query: "Bruno Silva",
+      count: 1,
+      total: 1,
+      records: [
+        {
+          employeeNumber: "EMP-002",
+          totalLateMinutes: 57,
+          occurrences: 2,
+        },
+      ],
+    });
+    expect(repo.summarizeEmployeeDelays).toHaveBeenCalledWith("Bruno Silva");
   });
 
   it("passes the complete previous calendar month to the repository", async () => {

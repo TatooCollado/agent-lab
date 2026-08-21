@@ -29,8 +29,8 @@ export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
         strict: true,
       },
     ],
-    [
-      "find_employee",
+  [
+    "find_employee",
       {
         type: "function",
         name: "find_employee",
@@ -48,8 +48,29 @@ export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
         },
         strict: true,
       },
-    ],
-    [
+  ],
+  [
+    "summarize_employee_delays",
+    {
+      type: "function",
+      name: "summarize_employee_delays",
+      description:
+        "Calcula las demoras o tardanzas totales históricas de un empleado buscado por nombre o legajo. Devuelve cantidad de llegadas tarde, minutos totales, promedio y máximo.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Nombre o número de empleado, por ejemplo Bruno Silva",
+          },
+        },
+        required: ["query"],
+        additionalProperties: false,
+      },
+      strict: true,
+    },
+  ],
+  [
       "list_late_arrivals",
       {
         type: "function",

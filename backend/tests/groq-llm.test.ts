@@ -63,4 +63,48 @@ describe("GroqChatLlm", () => {
     });
     expect(result).toEqual({ answer: "Ana Torres.", model: "openai/gpt-oss-20b" });
   });
+
+  it("retries once when Groq reports that the required tool was not called", async () => {
+    const missingToolError = Object.assign(
+      new Error("400 Tool choice is required, but model did not call a tool"),
+      { status: 400 }
+    );
+    const create = vi
+      .fn()
+      .mockRejectedValueOnce(missingToolError)
+      .mockResolvedValueOnce({
+        model: "openai/gpt-oss-20b",
+        choices: [{
+          message: {
+            role: "assistant",
+            content: null,
+            tool_calls: [{
+              id: "call-retry",
+              type: "function",
+              function: {
+                name: "find_employee",
+                arguments: '{"query":"EMP-001"}'
+              }
+            }]
+          }
+        }]
+      });
+    const client = { chat: { completions: { create } } } as unknown as OpenAI;
+    const llm = new GroqChatLlm("test-key", "openai/gpt-oss-20b", client);
+
+    const plan = await llm.plan({
+      question: "Buscá EMP-001",
+      instructions: "Use tools",
+      tools
+    });
+
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(create.mock.calls[1]?.[0].messages[0].content).toMatch(
+      /exactamente una herramienta/i
+    );
+    expect(plan.calls[0]).toMatchObject({
+      callId: "call-retry",
+      name: "find_employee"
+    });
+  });
 });

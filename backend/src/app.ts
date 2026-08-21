@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import helmet from "helmet";
+import * as helmetModule from "helmet";
 import { randomUUID } from "node:crypto";
 import { loadEnv } from "./config/env.js";
 import { calculatePeriod, periodNameSchema } from "./shared/time/period.js";
@@ -21,6 +21,7 @@ import { EVAL_CATALOG } from "./evals/catalog.js";
 import { agentRateLimit, loginRateLimit } from "./security/rate-limits.js";
 
 const SESSION_COOKIE = "agent_lab_session";
+const createHelmet = helmetModule.default as unknown as () => express.RequestHandler;
 
 function cookieValue(header: string | undefined, name: string): string | null {
   if (!header) return null;
@@ -51,7 +52,7 @@ export function createApp(options: {
 
   app.disable("x-powered-by");
   if (env.NODE_ENV === "production") app.set("trust proxy", 1);
-  app.use(helmet());
+  app.use(createHelmet());
   app.use(cors({ origin: env.FRONTEND_ORIGIN, credentials: true }));
   app.use(express.json({ limit: "32kb" }));
   app.use((req, res, next) => {

@@ -321,4 +321,6 @@ El backend público añade:
 - health check `GET /api/health`;
 - secretos declarados con `sync: false` o generados por Render.
 
+El build del backend usa `npm ci --include=dev` porque TypeScript y `@types/node` son dependencias de compilación. Render configura `NODE_ENV=production` para el servicio; sin esa opción, npm omitiría las herramientas necesarias antes de ejecutar `tsc`.
+
 Render Free es apropiado para esta demostración. El Web Service se suspende luego de 15 minutos sin tráfico y el primer acceso posterior puede tardar aproximadamente un minuto. El filesystem es efímero; el estado persistente continúa en Neon.

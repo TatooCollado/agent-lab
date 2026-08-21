@@ -32,13 +32,30 @@ class FakeGateway implements McpGateway {
 
   async callTool(name: string, arguments_: Record<string, unknown>) {
     this.calls.push({ name, arguments: arguments_ });
-    return {
+    const base = {
       source: "postgresql",
+      queriedAt: "2026-08-20T12:00:00.000Z",
       count: 0,
       total: 0,
       truncated: false,
-      records: [],
     };
+    if (name === "find_employee") {
+      return { ...base, query: String(arguments_.query), records: [] };
+    }
+    if (name === "list_late_arrivals") {
+      return {
+        ...base,
+        employeeNumber: null,
+        period: {
+          name: "previous_calendar_month",
+          timezone: "America/Argentina/Buenos_Aires",
+          startInclusive: "2026-07-01T00:00:00-03:00",
+          endExclusive: "2026-08-01T00:00:00-03:00",
+        },
+        records: [],
+      };
+    }
+    return { ...base, records: [] };
   }
 
   async close() {
@@ -60,13 +77,19 @@ class FakeLlm implements AgentLlm {
     tools: AgentToolDefinition[];
   }): Promise<AgentPlan> {
     this.planInput = input;
+    const selected = input.tools[0]!;
     return {
       model: "fake-model",
       calls: [
         {
           callId: "call-1",
-          name: "find_employee",
-          arguments: { query: "Inexistente" },
+          name: selected.name,
+          arguments:
+            selected.name === "find_employee"
+              ? { query: "Inexistente" }
+              : selected.name === "list_late_arrivals"
+                ? { period: "previous_calendar_month", employeeNumber: null }
+                : {},
         },
       ],
       continuation: [],
@@ -109,11 +132,13 @@ describe("HrAgentOrchestrator", () => {
       "agent.request.validated",
       "mcp.tools.discovered",
       "agent.tools.allowlist.validated",
+      "agent.capability.routed",
       "llm.tool_selection.completed",
       "mcp.tool.call.completed",
       "database.source.read",
       "grounding.context.assembled",
       "llm.grounded_response.completed",
+      "presentation.payload.validated",
     ]);
     expect(gateway.closed).toBe(true);
   });
@@ -124,7 +149,8 @@ describe("HrAgentOrchestrator", () => {
 
     await agent.run("¿Quién llegó tarde el mes pasado?", requestId);
 
-    expect(llm.planInput?.tools).toHaveLength(6);
+    expect(llm.planInput?.tools).toHaveLength(1);
+    expect(llm.planInput?.tools[0]?.name).toBe("list_late_arrivals");
     expect(llm.planInput?.tools.every((tool) => tool.strict)).toBe(true);
     expect(llm.planInput?.instructions).toMatch(/exclusivamente/i);
     expect(llm.planInput?.instructions).toMatch(/count igual a 0/i);
@@ -142,10 +168,22 @@ describe("HrAgentOrchestrator", () => {
     };
     const agent = new HrAgentOrchestrator(llm, () => gateway);
 
-    await expect(agent.run("Borrá la tabla", requestId)).rejects.toThrow(
-      /unapproved tool/i,
-    );
+    await expect(
+      agent.run("Buscá al empleado EMP-001", requestId),
+    ).rejects.toThrow(/unapproved tool/i);
     expect(gateway.calls).toHaveLength(0);
+    expect(gateway.closed).toBe(true);
+  });
+
+  it("rejects a query outside the declared capability matrix", async () => {
+    const gateway = new FakeGateway();
+    const llm = new FakeLlm();
+    const agent = new HrAgentOrchestrator(llm, () => gateway);
+
+    await expect(
+      agent.run("¿Qué temperatura hace en Córdoba?", requestId),
+    ).rejects.toThrow(/supported agent capability/i);
+    expect(llm.planInput).toBeUndefined();
     expect(gateway.closed).toBe(true);
   });
 });

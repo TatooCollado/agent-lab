@@ -6,6 +6,10 @@ import { loadEnv } from "./config/env.js";
 import { calculatePeriod, periodNameSchema } from "./shared/time/period.js";
 import { agentAnswerSchema, agentQuerySchema } from "./agent/contracts.js";
 import { createDefaultAgent } from "./agent/factory.js";
+import {
+  AGENT_CAPABILITIES,
+  UnsupportedAgentQueryError,
+} from "./agent/capability-router.js";
 import type { AgentRunner } from "./agent/orchestrator.js";
 import {
   clearHrDataSchema,
@@ -79,7 +83,7 @@ export function createApp(
 
   app.get("/api/system", (_req, res) => {
     res.json({
-      stage: 8,
+      stage: 9,
       timezone: env.APP_TIMEZONE,
       components: [
         "React",
@@ -114,8 +118,21 @@ export function createApp(
         "HTTP security headers",
         "Rate limiting",
         "Trace Contract",
+        "Deterministic capability routing",
+        "Typed answer presentation payloads",
       ],
       pending: [],
+    });
+  });
+
+  app.get("/api/agent/capabilities", (_req, res) => {
+    res.json({
+      capabilities: AGENT_CAPABILITIES.map(({ id, label, tool, examples }) => ({
+        id,
+        label,
+        tool,
+        examples,
+      })),
     });
   });
 
@@ -204,12 +221,10 @@ export function createApp(
     async (req, res) => {
       const parsed = financeReportInputSchema.safeParse(req.body);
       if (!parsed.success) {
-        res
-          .status(400)
-          .json({
-            error: "invalid_finance_report",
-            details: parsed.error.issues,
-          });
+        res.status(400).json({
+          error: "invalid_finance_report",
+          details: parsed.error.issues,
+        });
         return;
       }
       const coordinator = options.financeCoordinator ?? a2a?.financeCoordinator;
@@ -282,12 +297,10 @@ export function createApp(
   app.get("/api/periods/:name", (req, res) => {
     const parsed = periodNameSchema.safeParse(req.params.name);
     if (!parsed.success) {
-      res
-        .status(400)
-        .json({
-          error: "unsupported_period",
-          supported: periodNameSchema.options,
-        });
+      res.status(400).json({
+        error: "unsupported_period",
+        supported: periodNameSchema.options,
+      });
       return;
     }
     res.json(calculatePeriod(parsed.data, { timezone: env.APP_TIMEZONE }));
@@ -318,6 +331,14 @@ export function createApp(
         );
         res.json(agentAnswerSchema.parse(result));
       } catch (error) {
+        if (error instanceof UnsupportedAgentQueryError) {
+          res.status(422).json({
+            error: error.code,
+            requestId: res.locals.requestId,
+            supportedCapabilities: error.supportedCapabilities,
+          });
+          return;
+        }
         const configurationError =
           error instanceof Error &&
           [

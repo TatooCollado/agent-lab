@@ -7,7 +7,7 @@ Aplicación educativa para inspeccionar el flujo técnico de agentes de IA sobre
 
 ## Estado
 
-Etapas 1 a 8 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, cloud y entrega automatizada:
+Etapas 1 a 9 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, cloud, CI/CD y contratos deterministas:
 
 - frontend React + Vite;
 - backend Node.js + Express;
@@ -221,6 +221,28 @@ Content-Type: application/json
 
 La respuesta contiene `answer`, `model`, `grounded`, `toolsUsed` y una secuencia de eventos técnicos sanitizados. No incluye tokens, credenciales ni razonamiento interno.
 
+## Capability routing y presentación determinista
+
+Antes de llamar al modelo, un router TypeScript normaliza la pregunta y la compara con una matriz explícita de capacidades. Cada intención soportada reduce el catálogo entregado al LLM a una única herramienta MCP de mínimo alcance:
+
+| Capacidad                            | Herramienta                 |
+| ------------------------------------ | --------------------------- |
+| contar empleados                     | `count_employees`           |
+| listar el directorio                 | `list_employees`            |
+| buscar una persona                   | `find_employee`             |
+| resumir demoras históricas           | `summarize_employee_delays` |
+| consultar llegadas tarde por período | `list_late_arrivals`        |
+| consultar ausencias por período      | `list_absences`             |
+
+Una pregunta fuera de esta matriz se rechaza antes de consumir inferencia con HTTP `422` y `unsupported_agent_query`. El catálogo público se consulta en `GET /api/agent/capabilities` y también aparece en el System index.
+
+Después de ejecutar MCP, `AnswerPresentation` valida el `structuredContent` mediante una unión discriminada de Zod. La API devuelve dos superficies separadas:
+
+- `presentation`: `answerPayload` tipado, determinista y renderizado por un componente React específico;
+- `answer`: narrativa grounded generada por el LLM, visible en un panel secundario identificado como no determinista.
+
+Las cantidades, tablas, fechas, estados vacíos y metadatos de fuente se muestran desde `presentation`; no se extraen del texto del modelo. La traza incorpora `agent.capability.routed` y `presentation.payload.validated` para hacer visibles ambas decisiones técnicas.
+
 ## Autenticación y autorización
 
 Las credenciales se validan contra hashes bcrypt en `app_users`. Al autenticar, el backend crea un token aleatorio, guarda únicamente su hash SHA-256 en `app_sessions` y entrega el token mediante una cookie `HttpOnly`. El frontend nunca accede al token.
@@ -294,13 +316,16 @@ Los tests unitarios validan funciones y contratos con dependencias controladas. 
 
 Casos implementados:
 
+- `employee-count`: comprueba que una pregunta de cantidad se enruta exclusivamente a `count_employees`;
+- `employee-directory`: comprueba que una solicitud de nombres se enruta a `list_employees` y recupera el directorio;
+- `employee-delay-summary`: comprueba la agregación determinista de demoras de Bruno Silva mediante `summarize_employee_delays`;
 - `known-late-arrivals`: compara herramienta, grounding y cantidad contra el dataset sembrado;
 - `unknown-employee`: exige resultado PostgreSQL vacío y una respuesta explícita sin datos inventados;
 - `source-of-truth-freshness`: inserta un empleado temporal único y una llegada tarde, consulta el registro recién creado y comprueba que el agente observa la actualización.
 
 La fixture dinámica usa el rol administrativo sólo durante la preparación y limpieza. La consulta del agente continúa usando el rol read-only. Un bloque `finally` elimina por UUID y número de empleado exactos; al finalizar, una consulta adicional exige que no existan empleados `EVAL-%` ni asistencias con fuente `agent-evaluation`.
 
-Ejecución real con Ollama local, MCP y Neon:
+Ejecución real con el proveedor LLM configurado, MCP y Neon:
 
 ```bash
 npm run evals:run

@@ -5,6 +5,8 @@ import {
   type AgentQueryResponse,
 } from "./features/agent/api";
 import { FormattedAnswer } from "./features/agent/FormattedAnswer";
+import { StructuredAnswer } from "./features/agent/StructuredAnswer";
+import { CapabilityMatrix } from "./features/agent/CapabilityMatrix";
 import { AdminPanel } from "./features/auth/AdminPanel";
 import { currentSession, logout, type SessionUser } from "./features/auth/api";
 import { LoginScreen } from "./features/auth/LoginScreen";
@@ -38,6 +40,12 @@ const concepts = [
   ["22", "CI/CD", "GitHub Actions + Vercel Git integration"],
   ["23", "Quality Gates", "Typecheck + build + tests + audit"],
   ["24", "Deployment Smoke Test", "API + proxy + frontend contract"],
+  ["25", "Capability Routing", "Deterministic intent → least-capability tool"],
+  [
+    "26",
+    "Deterministic Presentation",
+    "Zod answerPayload → typed React component",
+  ],
 ];
 
 function errorMessage(error: unknown): string {
@@ -46,6 +54,9 @@ function errorMessage(error: unknown): string {
     return "The configured LLM provider is unavailable.";
   }
   if (code === "invalid_agent_query") return "The question is invalid.";
+  if (code === "unsupported_agent_query") {
+    return "Query outside the supported capability matrix. Check System index for examples.";
+  }
   if (code === "agent_execution_failed") {
     return error instanceof AgentQueryError && error.requestId
       ? `Agent execution failed · Request ID: ${error.requestId}`
@@ -160,7 +171,7 @@ export function App() {
           <code>{user.role}</code>
           <button onClick={() => void signOut()}>Sign out</button>
         </div>
-        <div className="stage-badge">Stage 08 · Automated delivery</div>
+        <div className="stage-badge">Stage 09 · Deterministic contracts</div>
       </header>
 
       <main id="top">
@@ -230,9 +241,17 @@ export function App() {
                     className="agent-answer"
                     aria-labelledby="answer-title"
                   >
-                    <span className="eyebrow">Grounded response</span>
-                    <h3 id="answer-title">Agent answer</h3>
-                    <FormattedAnswer answer={result.answer} />
+                    <span className="eyebrow">
+                      Deterministic grounded response
+                    </span>
+                    <h3 id="answer-title">Structured answer</h3>
+                    <StructuredAnswer presentation={result.presentation} />
+                    <details className="llm-narrative">
+                      <summary>
+                        LLM narrative · non-deterministic presentation
+                      </summary>
+                      <FormattedAnswer answer={result.answer} />
+                    </details>
                     <dl>
                       <div>
                         <dt>Model</dt>
@@ -275,6 +294,7 @@ export function App() {
                 </article>
               ))}
             </div>
+            <CapabilityMatrix />
             <AgentRegistry />
           </section>
         ) : (

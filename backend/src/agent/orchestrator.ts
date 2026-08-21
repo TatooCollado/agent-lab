@@ -5,9 +5,11 @@ import type {
   AgentAnswer,
   AgentLlm,
   AgentToolCall,
-  AgentToolOutput
+  AgentToolOutput,
 } from "./contracts.js";
 import type { McpGateway } from "./mcp-gateway.js";
+import { createAnswerPresentation } from "./answer-presentation.js";
+import { routeAgentCapability } from "./capability-router.js";
 import { HR_AGENT_SYSTEM_PROMPT } from "./system-prompt.js";
 import { CONTROLLED_TOOL_CATALOG, controlledTools } from "./tool-catalog.js";
 
@@ -21,22 +23,28 @@ function elapsed(startedAt: number): number {
 
 function event(
   requestId: string,
-  value: Omit<TraceEvent, "id" | "requestId" | "timestamp">
+  value: Omit<TraceEvent, "id" | "requestId" | "timestamp">,
 ): TraceEvent {
   return {
     id: randomUUID(),
     requestId,
     timestamp: new Date().toISOString(),
-    ...value
+    ...value,
   };
 }
 
-function validateCalls(calls: AgentToolCall[]): void {
+function validateCalls(
+  calls: AgentToolCall[],
+  allowedToolNames: Set<string>,
+): void {
   if (calls.length !== 1) {
     throw new Error(`Expected exactly one tool call, received ${calls.length}`);
   }
   const call = calls[0]!;
-  if (!CONTROLLED_TOOL_CATALOG.has(call.name)) {
+  if (
+    !CONTROLLED_TOOL_CATALOG.has(call.name) ||
+    !allowedToolNames.has(call.name)
+  ) {
     throw new Error(`Model selected an unapproved tool: ${call.name}`);
   }
 }
@@ -44,7 +52,7 @@ function validateCalls(calls: AgentToolCall[]): void {
 export class HrAgentOrchestrator implements AgentRunner {
   constructor(
     private readonly llm: AgentLlm,
-    private readonly gatewayFactory: () => McpGateway
+    private readonly gatewayFactory: () => McpGateway,
   ) {}
 
   async run(question: string, requestId: string): Promise<AgentAnswer> {
@@ -60,8 +68,8 @@ export class HrAgentOrchestrator implements AgentRunner {
         component: "HrAgentOrchestrator",
         concepts: ["Agent", "Input validation"],
         input: { questionLength: question.length },
-        output: { accepted: true }
-      })
+        output: { accepted: true },
+      }),
     );
 
     try {
@@ -78,11 +86,11 @@ export class HrAgentOrchestrator implements AgentRunner {
           concepts: ["MCP Client", "Tool discovery"],
           input: { transport: "stdio" },
           output: { tools: names },
-          durationMs: elapsed(startedAt)
-        })
+          durationMs: elapsed(startedAt),
+        }),
       );
 
-      const tools = controlledTools(names);
+      const controlled = controlledTools(names);
       trace.push(
         event(requestId, {
           category: "guardrail",
@@ -92,17 +100,35 @@ export class HrAgentOrchestrator implements AgentRunner {
           component: "ControlledToolCatalog",
           concepts: ["Guardrail", "Least privilege"],
           input: { discovered: names },
-          output: { allowed: tools.map((tool) => tool.name) }
-        })
+          output: { allowed: controlled.map((tool) => tool.name) },
+        }),
+      );
+
+      const routed = routeAgentCapability(question, controlled);
+      const tools = routed.tools;
+      trace.push(
+        event(requestId, {
+          category: "guardrail",
+          name: "agent.capability.routed",
+          status: "completed",
+          technology: "Deterministic TypeScript router",
+          component: "AgentCapabilityCatalog",
+          concepts: ["Capability routing", "Least capability"],
+          input: { questionLength: question.length },
+          output: {
+            capability: routed.capability.id,
+            allowedTools: tools.map((tool) => tool.name),
+          },
+        }),
       );
 
       startedAt = performance.now();
       const plan = await this.llm.plan({
         question,
         instructions: HR_AGENT_SYSTEM_PROMPT,
-        tools
+        tools,
       });
-      validateCalls(plan.calls);
+      validateCalls(plan.calls, new Set(tools.map((tool) => tool.name)));
       trace.push(
         event(requestId, {
           category: "llm",
@@ -115,11 +141,11 @@ export class HrAgentOrchestrator implements AgentRunner {
           output: {
             calls: plan.calls.map((call) => ({
               name: call.name,
-              arguments: call.arguments
-            }))
+              arguments: call.arguments,
+            })),
           },
-          durationMs: elapsed(startedAt)
-        })
+          durationMs: elapsed(startedAt),
+        }),
       );
 
       const toolOutputs: AgentToolOutput[] = [];
@@ -137,8 +163,8 @@ export class HrAgentOrchestrator implements AgentRunner {
             concepts: ["MCP Tool", "Structured Output"],
             input: call.arguments,
             output,
-            durationMs: elapsed(startedAt)
-          })
+            durationMs: elapsed(startedAt),
+          }),
         );
         trace.push(
           event(requestId, {
@@ -152,9 +178,9 @@ export class HrAgentOrchestrator implements AgentRunner {
             output: {
               source: output.source,
               count: output.count,
-              total: output.total
-            }
-          })
+              total: output.total,
+            },
+          }),
         );
       }
 
@@ -169,9 +195,9 @@ export class HrAgentOrchestrator implements AgentRunner {
           input: { tools: toolOutputs.map((item) => item.name) },
           output: {
             sources: toolOutputs.map((item) => item.output.source),
-            resultCounts: toolOutputs.map((item) => item.output.count)
-          }
-        })
+            resultCounts: toolOutputs.map((item) => item.output.count),
+          },
+        }),
       );
 
       startedAt = performance.now();
@@ -180,7 +206,7 @@ export class HrAgentOrchestrator implements AgentRunner {
         instructions: HR_AGENT_SYSTEM_PROMPT,
         tools,
         plan,
-        toolOutputs
+        toolOutputs,
       });
       trace.push(
         event(requestId, {
@@ -192,8 +218,22 @@ export class HrAgentOrchestrator implements AgentRunner {
           concepts: ["Grounded generation", "Function call output"],
           input: { toolOutputs: toolOutputs.length },
           output: { answerLength: final.answer.length },
-          durationMs: elapsed(startedAt)
-        })
+          durationMs: elapsed(startedAt),
+        }),
+      );
+
+      const presentation = createAnswerPresentation(toolOutputs[0]!);
+      trace.push(
+        event(requestId, {
+          category: "guardrail",
+          name: "presentation.payload.validated",
+          status: "completed",
+          technology: "Zod discriminated union",
+          component: "AnswerPresentation",
+          concepts: ["Deterministic presentation", "Schema validation"],
+          input: { tool: toolOutputs[0]!.name },
+          output: { kind: presentation.kind },
+        }),
       );
 
       return {
@@ -202,7 +242,8 @@ export class HrAgentOrchestrator implements AgentRunner {
         model: final.model,
         grounded: true,
         toolsUsed: toolOutputs.map((item) => item.name),
-        trace
+        presentation,
+        trace,
       };
     } finally {
       await gateway.close();

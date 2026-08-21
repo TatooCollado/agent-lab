@@ -1,23 +1,63 @@
 export const EVAL_CATALOG = [
   {
+    id: "employee-count",
+    title: "Employee count routing",
+    technique: "Capability routing evaluation",
+    prompt: "¿Cuántos empleados hay?",
+    invariants: ["grounded=true", "tool=count_employees", "database count=3"],
+  },
+  {
+    id: "employee-directory",
+    title: "Employee directory routing",
+    technique: "Capability routing evaluation",
+    prompt: "¿Quiénes son los empleados?",
+    invariants: ["grounded=true", "tool=list_employees", "database count=3"],
+  },
+  {
+    id: "employee-delay-summary",
+    title: "Employee delay aggregation routing",
+    technique: "Capability routing evaluation",
+    prompt: "Pasame las demoras totales de Bruno Silva.",
+    invariants: [
+      "grounded=true",
+      "tool=summarize_employee_delays",
+      "database count=1",
+      "employee=EMP-002",
+    ],
+  },
+  {
     id: "known-late-arrivals",
     title: "Known grounded records",
     technique: "Reference-based evaluation",
     prompt: "¿Qué empleados llegaron tarde durante el último mes?",
-    invariants: ["grounded=true", "tool=list_late_arrivals", "database count=2"]
+    invariants: [
+      "grounded=true",
+      "tool=list_late_arrivals",
+      "database count=2",
+    ],
   },
   {
     id: "unknown-employee",
     title: "No hallucination on empty result",
     technique: "Negative evaluation",
     prompt: "Buscá al empleado EMP-NOT-FOUND-EVAL.",
-    invariants: ["grounded=true", "tool=find_employee", "database count=0", "explicit no-result answer"]
+    invariants: [
+      "grounded=true",
+      "tool=find_employee",
+      "database count=0",
+      "explicit no-result answer",
+    ],
   },
   {
     id: "source-of-truth-freshness",
     title: "Fresh database update",
     technique: "Dynamic fixture evaluation",
     prompt: "Generated at runtime with a unique employee number.",
-    invariants: ["temporary record inserted", "fresh MCP query", "database count=1", "fixture always cleaned"]
-  }
+    invariants: [
+      "temporary record inserted",
+      "fresh MCP query",
+      "database count=1",
+      "fixture always cleaned",
+    ],
+  },
 ] as const;

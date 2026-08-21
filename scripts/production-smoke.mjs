@@ -21,10 +21,15 @@ assert.equal(directHealth.status, "ok");
 assert.equal(directHealth.service, "agent-lab-backend");
 
 const system = await (await request("/api/system")).json();
-assert.equal(system.stage, 8);
+assert.equal(system.stage, 9);
 assert.deepEqual(system.pending, []);
 assert.ok(system.components.includes("GitHub Actions"));
 assert.ok(system.components.includes("Deployment smoke tests"));
+assert.ok(system.components.includes("Deterministic capability routing"));
+assert.ok(system.components.includes("Typed answer presentation payloads"));
+
+const capabilities = await (await request("/api/agent/capabilities")).json();
+assert.equal(capabilities.capabilities.length, 6);
 
 const proxiedHealth = await (await request("/api/health", FRONTEND_URL)).json();
 assert.equal(proxiedHealth.status, "ok");
@@ -39,6 +44,7 @@ console.log(
     checks: [
       "vercel-health",
       "system-contract",
+      "capability-catalog",
       "render-proxy",
       "frontend-html",
     ],

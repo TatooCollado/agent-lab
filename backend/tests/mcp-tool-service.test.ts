@@ -5,30 +5,47 @@ import { HrToolService } from "../src/mcp/tool-service.js";
 
 const timezone = "America/Argentina/Buenos_Aires";
 const fixedNow = DateTime.fromISO("2026-08-15T14:30:00", {
-  zone: timezone
+  zone: timezone,
 }).toJSDate();
 
 function repository(): HrRepository {
   return {
+    countEmployees: vi
+      .fn()
+      .mockResolvedValue({ total: 8, active: 7, inactive: 1 }),
     findEmployees: vi.fn().mockResolvedValue({
       records: [],
       total: 0,
-      truncated: false
+      truncated: false,
     }),
     listLateArrivals: vi.fn().mockResolvedValue({
       records: [],
       total: 0,
-      truncated: false
+      truncated: false,
     }),
     listAbsences: vi.fn().mockResolvedValue({
       records: [],
       total: 0,
-      truncated: false
-    })
+      truncated: false,
+    }),
   };
 }
 
 describe("HrToolService", () => {
+  it("returns employee totals computed by PostgreSQL", async () => {
+    const repo = repository();
+    const service = new HrToolService(repo, timezone, () => fixedNow);
+
+    await expect(service.countEmployees()).resolves.toMatchObject({
+      source: "postgresql",
+      count: 8,
+      total: 8,
+      active: 7,
+      inactive: 1,
+      truncated: false,
+    });
+  });
+
   it("returns an explicit empty collection for a search without matches", async () => {
     const repo = repository();
     const service = new HrToolService(repo, timezone, () => fixedNow);
@@ -41,7 +58,7 @@ describe("HrToolService", () => {
       count: 0,
       total: 0,
       truncated: false,
-      records: []
+      records: [],
     });
   });
 
@@ -50,7 +67,7 @@ describe("HrToolService", () => {
     const service = new HrToolService(repo, timezone, () => fixedNow);
 
     const output = await service.listLateArrivals({
-      period: "previous_calendar_month"
+      period: "previous_calendar_month",
     });
 
     expect(repo.listLateArrivals).toHaveBeenCalledWith(
@@ -58,9 +75,9 @@ describe("HrToolService", () => {
         name: "previous_calendar_month",
         timezone,
         startInclusive: "2026-07-01T00:00:00-03:00",
-        endExclusive: "2026-08-01T00:00:00-03:00"
+        endExclusive: "2026-08-01T00:00:00-03:00",
       },
-      undefined
+      undefined,
     );
     expect(output.count).toBe(0);
   });

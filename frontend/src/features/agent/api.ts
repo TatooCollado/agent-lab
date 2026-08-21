@@ -9,12 +9,23 @@ export type AgentQueryResponse = {
   trace: TraceEvent[];
 };
 
-export async function runAgentQuery(question: string): Promise<AgentQueryResponse> {
+export class AgentQueryError extends Error {
+  constructor(
+    public readonly code: string,
+    public readonly requestId?: string,
+  ) {
+    super(code);
+  }
+}
+
+export async function runAgentQuery(
+  question: string,
+): Promise<AgentQueryResponse> {
   const response = await fetch("/api/agent/query", {
     method: "POST",
     credentials: "include",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ question })
+    body: JSON.stringify({ question }),
   });
 
   if (!response.ok) {
@@ -23,7 +34,11 @@ export async function runAgentQuery(question: string): Promise<AgentQueryRespons
       typeof body === "object" && body !== null && "error" in body
         ? String(body.error)
         : "unknown_error";
-    throw new Error(code);
+    const requestId =
+      typeof body === "object" && body !== null && "requestId" in body
+        ? String(body.requestId)
+        : undefined;
+    throw new AgentQueryError(code, requestId);
   }
 
   return (await response.json()) as AgentQueryResponse;

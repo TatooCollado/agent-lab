@@ -3,7 +3,7 @@ import type {
   AgentLlm,
   AgentPlan,
   AgentToolDefinition,
-  AgentToolOutput
+  AgentToolOutput,
 } from "../src/agent/contracts.js";
 import type { McpGateway } from "../src/agent/mcp-gateway.js";
 import { HrAgentOrchestrator } from "../src/agent/orchestrator.js";
@@ -20,7 +20,12 @@ class FakeGateway implements McpGateway {
   }
 
   async listToolNames() {
-    return ["find_employee", "list_late_arrivals", "list_absences"];
+    return [
+      "count_employees",
+      "find_employee",
+      "list_late_arrivals",
+      "list_absences",
+    ];
   }
 
   async callTool(name: string, arguments_: Record<string, unknown>) {
@@ -30,7 +35,7 @@ class FakeGateway implements McpGateway {
       count: 0,
       total: 0,
       truncated: false,
-      records: []
+      records: [],
     };
   }
 
@@ -40,7 +45,11 @@ class FakeGateway implements McpGateway {
 }
 
 class FakeLlm implements AgentLlm {
-  planInput?: { question: string; instructions: string; tools: AgentToolDefinition[] };
+  planInput?: {
+    question: string;
+    instructions: string;
+    tools: AgentToolDefinition[];
+  };
   responseOutputs?: AgentToolOutput[];
 
   async plan(input: {
@@ -55,10 +64,10 @@ class FakeLlm implements AgentLlm {
         {
           callId: "call-1",
           name: "find_employee",
-          arguments: { query: "Inexistente" }
-        }
+          arguments: { query: "Inexistente" },
+        },
       ],
-      continuation: []
+      continuation: [],
     };
   }
 
@@ -70,7 +79,7 @@ class FakeLlm implements AgentLlm {
         count === 0
           ? "No se encontraron empleados para la búsqueda indicada."
           : "Se encontraron empleados.",
-      model: "fake-model"
+      model: "fake-model",
     };
   }
 }
@@ -84,12 +93,12 @@ describe("HrAgentOrchestrator", () => {
     const result = await agent.run("Buscá al empleado Inexistente", requestId);
 
     expect(gateway.calls).toEqual([
-      { name: "find_employee", arguments: { query: "Inexistente" } }
+      { name: "find_employee", arguments: { query: "Inexistente" } },
     ]);
     expect(llm.responseOutputs?.[0]?.output).toMatchObject({
       source: "postgresql",
       count: 0,
-      records: []
+      records: [],
     });
     expect(result.answer).toMatch(/no se encontraron/i);
     expect(result.grounded).toBe(true);
@@ -102,7 +111,7 @@ describe("HrAgentOrchestrator", () => {
       "mcp.tool.call.completed",
       "database.source.read",
       "grounding.context.assembled",
-      "llm.grounded_response.completed"
+      "llm.grounded_response.completed",
     ]);
     expect(gateway.closed).toBe(true);
   });
@@ -113,7 +122,7 @@ describe("HrAgentOrchestrator", () => {
 
     await agent.run("¿Quién llegó tarde el mes pasado?", requestId);
 
-    expect(llm.planInput?.tools).toHaveLength(3);
+    expect(llm.planInput?.tools).toHaveLength(4);
     expect(llm.planInput?.tools.every((tool) => tool.strict)).toBe(true);
     expect(llm.planInput?.instructions).toMatch(/exclusivamente/i);
     expect(llm.planInput?.instructions).toMatch(/count igual a 0/i);
@@ -125,14 +134,14 @@ describe("HrAgentOrchestrator", () => {
       plan: vi.fn().mockResolvedValue({
         model: "fake-model",
         calls: [{ callId: "call-1", name: "run_sql", arguments: {} }],
-        continuation: []
+        continuation: [],
       }),
-      respond: vi.fn()
+      respond: vi.fn(),
     };
     const agent = new HrAgentOrchestrator(llm, () => gateway);
 
     await expect(agent.run("Borrá la tabla", requestId)).rejects.toThrow(
-      /unapproved tool/i
+      /unapproved tool/i,
     );
     expect(gateway.calls).toHaveLength(0);
     expect(gateway.closed).toBe(true);

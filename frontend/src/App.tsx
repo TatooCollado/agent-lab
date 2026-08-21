@@ -1,5 +1,9 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { runAgentQuery, type AgentQueryResponse } from "./features/agent/api";
+import {
+  AgentQueryError,
+  runAgentQuery,
+  type AgentQueryResponse,
+} from "./features/agent/api";
 import { FormattedAnswer } from "./features/agent/FormattedAnswer";
 import { AdminPanel } from "./features/auth/AdminPanel";
 import { currentSession, logout, type SessionUser } from "./features/auth/api";
@@ -13,7 +17,7 @@ const concepts = [
   ["01", "Source of Truth", "PostgreSQL · Neon"],
   ["02", "Structured Outputs", "Zod + MCP structuredContent"],
   ["03", "Tool Calling", "Groq GPT-OSS 20B · Ollama local"],
-  ["04", "MCP", "Client + Server · stdio / in-process"],
+  ["04", "MCP", "Client + Server · 4 read-only tools"],
   ["05", "Grounding", "Required tool call + system prompt"],
   ["06", "Guardrails", "Allowlist + read-only database role"],
   ["07", "Observability", "Sanitized TraceEvent stream"],
@@ -33,23 +37,31 @@ const concepts = [
   ["21", "Transport Selection", "MCP stdio local · in-process cloud"],
   ["22", "CI/CD", "GitHub Actions + Vercel Git integration"],
   ["23", "Quality Gates", "Typecheck + build + tests + audit"],
-  ["24", "Deployment Smoke Test", "API + proxy + frontend contract"]
+  ["24", "Deployment Smoke Test", "API + proxy + frontend contract"],
 ];
 
-function errorMessage(code: string): string {
+function errorMessage(error: unknown): string {
+  const code = error instanceof AgentQueryError ? error.code : "unknown_error";
   if (code === "agent_not_configured") {
     return "The configured LLM provider is unavailable.";
   }
   if (code === "invalid_agent_query") return "The question is invalid.";
+  if (code === "agent_execution_failed") {
+    return error instanceof AgentQueryError && error.requestId
+      ? `Agent execution failed · Request ID: ${error.requestId}`
+      : "Agent execution failed.";
+  }
   return "The agent could not complete the query.";
 }
 
 export function App() {
-  const [activeView, setActiveView] = useState<"lab" | "finance" | "evals" | "system" | "admin">("lab");
+  const [activeView, setActiveView] = useState<
+    "lab" | "finance" | "evals" | "system" | "admin"
+  >("lab");
   const [user, setUser] = useState<SessionUser | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [question, setQuestion] = useState(
-    "¿Qué empleados llegaron tarde durante el último mes?"
+    "¿Qué empleados llegaron tarde durante el último mes?",
   );
   const [result, setResult] = useState<AgentQueryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +88,7 @@ export function App() {
       setResult(await runAgentQuery(question.trim()));
     } catch (caught) {
       setResult(null);
-      setError(errorMessage(caught instanceof Error ? caught.message : "unknown_error"));
+      setError(errorMessage(caught));
     } finally {
       setRunning(false);
     }
@@ -90,7 +102,12 @@ export function App() {
   }
 
   if (sessionLoading) {
-    return <main className="session-loading"><span className="brand-mark">AL</span><p>Resolving session…</p></main>;
+    return (
+      <main className="session-loading">
+        <span className="brand-mark">AL</span>
+        <p>Resolving session…</p>
+      </main>
+    );
   }
 
   if (!user) return <LoginScreen onAuthenticated={setUser} />;
@@ -100,16 +117,49 @@ export function App() {
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Agent Lab home">
           <span className="brand-mark">AL</span>
-          <span>Agent Lab <small>technical workspace</small></span>
+          <span>
+            Agent Lab <small>technical workspace</small>
+          </span>
         </a>
         <nav aria-label="Primary navigation">
-          <button className={activeView === "lab" ? "active" : ""} onClick={() => setActiveView("lab")}>Lab</button>
-          <button className={activeView === "finance" ? "active" : ""} onClick={() => setActiveView("finance")}>Finance</button>
-          <button className={activeView === "evals" ? "active" : ""} onClick={() => setActiveView("evals")}>Evals</button>
-          <button className={activeView === "system" ? "active" : ""} onClick={() => setActiveView("system")}>System index</button>
-          {user.role === "admin" && <button className={activeView === "admin" ? "active" : ""} onClick={() => setActiveView("admin")}>Admin</button>}
+          <button
+            className={activeView === "lab" ? "active" : ""}
+            onClick={() => setActiveView("lab")}
+          >
+            Lab
+          </button>
+          <button
+            className={activeView === "finance" ? "active" : ""}
+            onClick={() => setActiveView("finance")}
+          >
+            Finance
+          </button>
+          <button
+            className={activeView === "evals" ? "active" : ""}
+            onClick={() => setActiveView("evals")}
+          >
+            Evals
+          </button>
+          <button
+            className={activeView === "system" ? "active" : ""}
+            onClick={() => setActiveView("system")}
+          >
+            System index
+          </button>
+          {user.role === "admin" && (
+            <button
+              className={activeView === "admin" ? "active" : ""}
+              onClick={() => setActiveView("admin")}
+            >
+              Admin
+            </button>
+          )}
         </nav>
-        <div className="session-chip"><span>{user.username}</span><code>{user.role}</code><button onClick={() => void signOut()}>Sign out</button></div>
+        <div className="session-chip">
+          <span>{user.username}</span>
+          <code>{user.role}</code>
+          <button onClick={() => void signOut()}>Sign out</button>
+        </div>
         <div className="stage-badge">Stage 08 · Automated delivery</div>
       </header>
 
@@ -119,18 +169,39 @@ export function App() {
             <section className="hero">
               <div>
                 <span className="eyebrow">AI systems observability</span>
-                <h1>Query enterprise data.<br /><em>Inspect every protocol.</em></h1>
-                <p>Grounded agent execution through local LLM tool calling, MCP and fresh PostgreSQL queries.</p>
+                <h1>
+                  Query enterprise data.
+                  <br />
+                  <em>Inspect every protocol.</em>
+                </h1>
+                <p>
+                  Grounded agent execution through local LLM tool calling, MCP
+                  and fresh PostgreSQL queries.
+                </p>
               </div>
-              <div className="architecture-mini" aria-label="Architecture preview">
-                <span>UI</span><i>→</i><span>Agent</span><i>→</i><span>LLM</span><i>→</i><span>MCP</span><i>→</i><span>DB</span>
+              <div
+                className="architecture-mini"
+                aria-label="Architecture preview"
+              >
+                <span>UI</span>
+                <i>→</i>
+                <span>Agent</span>
+                <i>→</i>
+                <span>LLM</span>
+                <i>→</i>
+                <span>MCP</span>
+                <i>→</i>
+                <span>DB</span>
               </div>
             </section>
 
             <div className="workspace-grid">
               <section className="panel query-panel">
                 <div className="panel-heading">
-                  <div><span className="eyebrow">Natural language input</span><h2>Enterprise query</h2></div>
+                  <div>
+                    <span className="eyebrow">Natural language input</span>
+                    <h2>Enterprise query</h2>
+                  </div>
                   <span className="readonly-pill">Read-only tools</span>
                 </div>
                 <label htmlFor="query">Question</label>
@@ -141,19 +212,40 @@ export function App() {
                   onKeyDown={handleShortcut}
                   disabled={running}
                 />
-                <button className="run-button" onClick={() => void execute()} disabled={running || question.trim().length < 3}>
-                  {running ? "Running agent…" : "Run agent"} <span>Ctrl/⌘ ↵</span>
+                <button
+                  className="run-button"
+                  onClick={() => void execute()}
+                  disabled={running || question.trim().length < 3}
+                >
+                  {running ? "Running agent…" : "Run agent"}{" "}
+                  <span>Ctrl/⌘ ↵</span>
                 </button>
-                {error && <p className="query-error" role="alert">{error}</p>}
+                {error && (
+                  <p className="query-error" role="alert">
+                    {error}
+                  </p>
+                )}
                 {result && (
-                  <section className="agent-answer" aria-labelledby="answer-title">
+                  <section
+                    className="agent-answer"
+                    aria-labelledby="answer-title"
+                  >
                     <span className="eyebrow">Grounded response</span>
                     <h3 id="answer-title">Agent answer</h3>
                     <FormattedAnswer answer={result.answer} />
                     <dl>
-                      <div><dt>Model</dt><dd>{result.model}</dd></div>
-                      <div><dt>Tools</dt><dd>{result.toolsUsed.join(", ")}</dd></div>
-                      <div><dt>Grounded</dt><dd>{String(result.grounded)}</dd></div>
+                      <div>
+                        <dt>Model</dt>
+                        <dd>{result.model}</dd>
+                      </div>
+                      <div>
+                        <dt>Tools</dt>
+                        <dd>{result.toolsUsed.join(", ")}</dd>
+                      </div>
+                      <div>
+                        <dt>Grounded</dt>
+                        <dd>{String(result.grounded)}</dd>
+                      </div>
                     </dl>
                   </section>
                 )}
@@ -161,12 +253,18 @@ export function App() {
               <TraceInspector events={result?.trace ?? []} />
             </div>
           </>
-        ) : activeView === "finance" ? <FinanceLab /> : activeView === "evals" ? <EvalCatalog /> : activeView === "system" ? (
+        ) : activeView === "finance" ? (
+          <FinanceLab />
+        ) : activeView === "evals" ? (
+          <EvalCatalog />
+        ) : activeView === "system" ? (
           <section className="system-index">
             <div className="index-heading">
               <span className="eyebrow">Applied concepts</span>
               <h1>System index</h1>
-              <p>Implementation status and owning technology for each concept.</p>
+              <p>
+                Implementation status and owning technology for each concept.
+              </p>
             </div>
             <div className="concept-grid">
               {concepts.map(([number, concept, technology]) => (
@@ -179,7 +277,9 @@ export function App() {
             </div>
             <AgentRegistry />
           </section>
-        ) : <AdminPanel />}
+        ) : (
+          <AdminPanel />
+        )}
       </main>
     </div>
   );

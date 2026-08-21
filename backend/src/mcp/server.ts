@@ -2,10 +2,12 @@ import { McpServer } from "@modelcontextprotocol/server";
 import type { HrRepository } from "../repositories/hr-repository.js";
 import {
   absencesOutputSchema,
+  countEmployeesInputSchema,
+  countEmployeesOutputSchema,
   findEmployeeInputSchema,
   findEmployeeOutputSchema,
   lateArrivalsOutputSchema,
-  periodInputSchema
+  periodInputSchema,
 } from "./contracts.js";
 import { HrToolService } from "./tool-service.js";
 
@@ -13,13 +15,13 @@ const readOnlyAnnotations = {
   readOnlyHint: true,
   destructiveHint: false,
   idempotentHint: true,
-  openWorldHint: false
+  openWorldHint: false,
 } as const;
 
 function toolResult(output: Record<string, unknown>) {
   return {
     content: [{ type: "text" as const, text: JSON.stringify(output) }],
-    structuredContent: output
+    structuredContent: output,
   };
 }
 
@@ -33,23 +35,36 @@ async function executeTool(operation: () => Promise<Record<string, unknown>>) {
       content: [
         {
           type: "text" as const,
-          text: "La herramienta no pudo completar la consulta solicitada."
-        }
+          text: "La herramienta no pudo completar la consulta solicitada.",
+        },
       ],
-      isError: true
+      isError: true,
     };
   }
 }
 
 export function createHrMcpServer(
   repository: HrRepository,
-  timezone: string
+  timezone: string,
 ): McpServer {
   const server = new McpServer(
     { name: "agent-lab-hr", version: "0.2.0" },
-    { capabilities: { tools: {} } }
+    { capabilities: { tools: {} } },
   );
   const service = new HrToolService(repository, timezone);
+
+  server.registerTool(
+    "count_employees",
+    {
+      title: "Contar empleados",
+      description:
+        "Cuenta todos los empleados en PostgreSQL y separa activos e inactivos.",
+      inputSchema: countEmployeesInputSchema,
+      outputSchema: countEmployeesOutputSchema,
+      annotations: readOnlyAnnotations,
+    },
+    async () => executeTool(() => service.countEmployees()),
+  );
 
   server.registerTool(
     "find_employee",
@@ -59,9 +74,9 @@ export function createHrMcpServer(
         "Busca empleados activos o inactivos por nombre o número en PostgreSQL.",
       inputSchema: findEmployeeInputSchema,
       outputSchema: findEmployeeOutputSchema,
-      annotations: readOnlyAnnotations
+      annotations: readOnlyAnnotations,
     },
-    async (input) => executeTool(() => service.findEmployee(input))
+    async (input) => executeTool(() => service.findEmployee(input)),
   );
 
   server.registerTool(
@@ -72,9 +87,9 @@ export function createHrMcpServer(
         "Consulta llegadas tarde en PostgreSQL para un período calendario y empleado opcional.",
       inputSchema: periodInputSchema,
       outputSchema: lateArrivalsOutputSchema,
-      annotations: readOnlyAnnotations
+      annotations: readOnlyAnnotations,
     },
-    async (input) => executeTool(() => service.listLateArrivals(input))
+    async (input) => executeTool(() => service.listLateArrivals(input)),
   );
 
   server.registerTool(
@@ -85,9 +100,9 @@ export function createHrMcpServer(
         "Consulta ausencias en PostgreSQL para un período calendario y empleado opcional.",
       inputSchema: periodInputSchema,
       outputSchema: absencesOutputSchema,
-      annotations: readOnlyAnnotations
+      annotations: readOnlyAnnotations,
     },
-    async (input) => executeTool(() => service.listAbsences(input))
+    async (input) => executeTool(() => service.listAbsences(input)),
   );
 
   return server;

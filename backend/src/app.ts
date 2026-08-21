@@ -100,7 +100,7 @@ export function createApp(options: {
         "Rate limiting",
         "Trace Contract"
       ],
-      pending: ["Production deployment verification"]
+      pending: []
     });
   });
 

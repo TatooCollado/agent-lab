@@ -30,7 +30,7 @@ describe("GET /api/evals/catalog", () => {
       expect.arrayContaining([
         expect.objectContaining({
           id: "source-of-truth-freshness",
-          technique: "Dynamic fixture evaluation",
+          technique: "Evaluación con fixture dinámico",
         }),
         expect.objectContaining({
           id: "semantic-robustness-v1",

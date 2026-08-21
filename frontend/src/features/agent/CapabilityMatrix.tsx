@@ -14,37 +14,38 @@ export function CapabilityMatrix() {
   return (
     <section className="capability-matrix" aria-labelledby="capability-title">
       <div className="index-heading">
-        <span className="eyebrow">Validated semantic routing</span>
-        <h2 id="capability-title">Capability matrix</h2>
+        <span className="eyebrow">Enrutamiento semántico validado</span>
+        <h2 id="capability-title">Matriz de capacidades</h2>
         <p>
-          The LLM proposes one semantic decision. The backend validates its
-          capability, schema, period and safety boundaries before MCP executes.
+          El LLM propone una decisión semántica. Antes de ejecutar MCP, el
+          backend valida la capacidad, el esquema, el período y los límites de
+          seguridad.
         </p>
         <ol className="semantic-contract">
           <li>
-            <strong>LLM proposal</strong> — 7 MCP capabilities plus
-            clarification and unsupported control decisions.
+            <strong>Propuesta del LLM</strong> — 7 capacidades MCP más
+            decisiones controladas de aclaración y consulta no soportada.
           </li>
           <li>
-            <strong>Backend validation</strong> — allowlist, Zod arguments,
-            temporal consistency, polarity and business boundaries.
+            <strong>Validación del backend</strong> — allowlist, argumentos Zod,
+            consistencia temporal, polaridad y límites del negocio.
           </li>
           <li>
-            <strong>MCP execution</strong> — only a validated read-only decision
-            can query PostgreSQL.
+            <strong>Ejecución MCP</strong> — sólo una decisión validada y de
+            lectura puede consultar PostgreSQL.
           </li>
         </ol>
       </div>
       {failed ? (
-        <p>Capability catalog unavailable.</p>
+        <p>El catálogo de capacidades no está disponible.</p>
       ) : (
         <div className="structured-table-wrap">
           <table className="structured-table">
             <thead>
               <tr>
-                <th>Capability</th>
-                <th>MCP tool</th>
-                <th>Example</th>
+                <th>Capacidad</th>
+                <th>Herramienta MCP</th>
+                <th>Ejemplo</th>
               </tr>
             </thead>
             <tbody>

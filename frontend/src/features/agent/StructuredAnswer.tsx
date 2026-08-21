@@ -1,7 +1,11 @@
 import type { AnswerPresentation, EmployeeRecord } from "./api";
 
 function EmptyResult() {
-  return <p className="structured-empty">No records matched the query.</p>;
+  return (
+    <p className="structured-empty">
+      No se encontraron registros para la consulta.
+    </p>
+  );
 }
 
 function ResultFooter({
@@ -16,9 +20,9 @@ function ResultFooter({
 }) {
   return (
     <div className="structured-source">
-      <span>Source: {data.source}</span>
+      <span>Fuente: {data.source}</span>
       <span>Total: {data.total}</span>
-      <span>Truncated: {String(data.truncated)}</span>
+      <span>Resultado parcial: {data.truncated ? "sí" : "no"}</span>
       <time dateTime={data.queriedAt}>{data.queriedAt}</time>
     </div>
   );
@@ -31,10 +35,10 @@ function EmployeeTable({ records }: { records: EmployeeRecord[] }) {
       <table className="structured-table">
         <thead>
           <tr>
-            <th>Employee</th>
+            <th>Empleado</th>
             <th>ID</th>
-            <th>Department</th>
-            <th>Status</th>
+            <th>Departamento</th>
+            <th>Estado</th>
           </tr>
         </thead>
         <tbody>
@@ -47,7 +51,7 @@ function EmployeeTable({ records }: { records: EmployeeRecord[] }) {
               <td>
                 {record.departmentName} <small>{record.departmentCode}</small>
               </td>
-              <td>{record.active ? "Active" : "Inactive"}</td>
+              <td>{record.active ? "Activo" : "Inactivo"}</td>
             </tr>
           ))}
         </tbody>
@@ -73,11 +77,11 @@ export function StructuredAnswer({
             <strong>{presentation.data.total}</strong>
           </div>
           <div>
-            <span>Active</span>
+            <span>Activos</span>
             <strong>{presentation.data.active}</strong>
           </div>
           <div>
-            <span>Inactive</span>
+            <span>Inactivos</span>
             <strong>{presentation.data.inactive}</strong>
           </div>
         </div>
@@ -97,12 +101,12 @@ export function StructuredAnswer({
             <table className="structured-table">
               <thead>
                 <tr>
-                  <th>Employee</th>
-                  <th>Occurrences</th>
+                  <th>Empleado</th>
+                  <th>Ocurrencias</th>
                   <th>Total</th>
-                  <th>Average</th>
-                  <th>Maximum</th>
-                  <th>Range</th>
+                  <th>Promedio</th>
+                  <th>Máximo</th>
+                  <th>Período registrado</th>
                 </tr>
               </thead>
               <tbody>
@@ -135,11 +139,11 @@ export function StructuredAnswer({
             <table className="structured-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Employee</th>
-                  <th>Scheduled</th>
-                  <th>Arrival</th>
-                  <th>Delay</th>
+                  <th>Fecha</th>
+                  <th>Empleado</th>
+                  <th>Horario previsto</th>
+                  <th>Llegada real</th>
+                  <th>Demora</th>
                 </tr>
               </thead>
               <tbody>
@@ -169,10 +173,10 @@ export function StructuredAnswer({
             <table className="structured-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Employee</th>
-                  <th>Department</th>
-                  <th>Reason</th>
+                  <th>Fecha</th>
+                  <th>Empleado</th>
+                  <th>Departamento</th>
+                  <th>Motivo</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,7 +188,7 @@ export function StructuredAnswer({
                       <small>{record.employeeNumber}</small>
                     </td>
                     <td>{record.departmentCode}</td>
-                    <td>{record.absenceReason ?? "Not specified"}</td>
+                    <td>{record.absenceReason ?? "No especificado"}</td>
                   </tr>
                 ))}
               </tbody>

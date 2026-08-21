@@ -27,14 +27,14 @@ describe("App", () => {
     render(<App />);
 
     expect(
-      await screen.findByRole("heading", { name: "Execution trace" }),
+      await screen.findByRole("heading", { name: "Traza de ejecución" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/run an agent query/i)).toBeInTheDocument();
+    expect(screen.getByText(/ejecutá una consulta/i)).toBeInTheDocument();
     expect(
       screen.queryByText(/¿Por qué existe este paso?/i),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Admin" }),
+      screen.queryByRole("button", { name: "Administración" }),
     ).not.toBeInTheDocument();
   });
 
@@ -102,8 +102,8 @@ describe("App", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<App />);
 
-    await screen.findByRole("heading", { name: "Execution trace" });
-    fireEvent.click(screen.getByRole("button", { name: /run agent/i }));
+    await screen.findByRole("heading", { name: "Traza de ejecución" });
+    fireEvent.click(screen.getByRole("button", { name: /ejecutar agente/i }));
 
     expect(await screen.findByText("answerPayload")).toBeInTheDocument();
     expect(screen.getAllByText("Ana Torres").length).toBeGreaterThan(0);
@@ -130,12 +130,14 @@ describe("App", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<App />);
 
-    fireEvent.click(await screen.findByRole("button", { name: "Admin" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Administración" }),
+    );
     expect(
-      await screen.findByRole("heading", { name: "Administration" }),
+      await screen.findByRole("heading", { name: "Administración" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Clear HR data" }),
+      screen.getByRole("button", { name: "Eliminar datos de RR. HH." }),
     ).toBeDisabled();
   });
 
@@ -207,23 +209,38 @@ describe("App", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<App />);
 
-    fireEvent.click(await screen.findByRole("button", { name: "Finance" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Finanzas" }));
+    expect(
+      screen.getByRole("heading", {
+        name: "Un pedido, dos responsabilidades",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/el LLM coordina/i)).toBeInTheDocument();
     const runButton = screen.getByRole("button", {
-      name: /generate grounded report/i,
+      name: /generar informe con datos reales/i,
     });
     expect(runButton).toBeDisabled();
-    fireEvent.change(screen.getByLabelText("Daily employee cost"), {
+    fireEvent.change(screen.getByLabelText("Costo diario por empleado"), {
       target: { value: "100000" },
     });
-    fireEvent.change(screen.getByLabelText("Replacement premium %"), {
+    fireEvent.change(screen.getByLabelText("Recargo por reemplazo %"), {
       target: { value: "35" },
     });
-    fireEvent.change(screen.getByLabelText("Productivity impact %"), {
+    fireEvent.change(screen.getByLabelText("Impacto de productividad %"), {
       target: { value: "20" },
     });
     fireEvent.click(runButton);
 
-    expect(await screen.findByText(/1 absence day\(s\)/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/1 día\(s\) de ausencia/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Cómo se obtuvo el resultado")).toBeInTheDocument();
+    expect(
+      screen.getByText("Evidencia de la interacción A2A"),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/base \+ reemplazo \+ productividad/i)).toHaveTextContent(
+      /155\.000/,
+    );
     expect(screen.getByText("a2a.artifact.received")).toBeInTheDocument();
   });
 
@@ -255,10 +272,12 @@ describe("App", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<App />);
 
-    fireEvent.click(await screen.findByRole("button", { name: "Evals" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Evaluaciones" }),
+    );
 
     expect(
-      await screen.findByRole("heading", { name: "Agent evaluations" }),
+      await screen.findByRole("heading", { name: "Evaluaciones del agente" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Dynamic fixture evaluation")).toBeInTheDocument();
     expect(screen.getByText("fixture always cleaned")).toBeInTheDocument();
@@ -323,28 +342,32 @@ describe("App", () => {
     render(<App />);
 
     fireEvent.click(
-      await screen.findByRole("button", { name: "System index" }),
+      await screen.findByRole("button", { name: "Índice técnico" }),
     );
 
     expect(
-      await screen.findByRole("heading", { name: "System index" }),
+      await screen.findByRole("heading", {
+        name: "Índice técnico del sistema",
+      }),
     ).toBeInTheDocument();
     expect(screen.getByText("CI/CD")).toBeInTheDocument();
-    expect(screen.getByText("Quality Gates")).toBeInTheDocument();
-    expect(screen.getByText("Deployment Smoke Test")).toBeInTheDocument();
-    expect(screen.getByText("Semantic Routing")).toBeInTheDocument();
-    expect(screen.getByText("Deterministic Presentation")).toBeInTheDocument();
-    expect(screen.getByText("Set Complement")).toBeInTheDocument();
-    expect(screen.getByText("Controlled Retry")).toBeInTheDocument();
-    expect(screen.getByText("Circuit Breaker")).toBeInTheDocument();
-    expect(screen.getByText("Graceful Degradation")).toBeInTheDocument();
+    expect(screen.getByText("Controles de calidad")).toBeInTheDocument();
+    expect(screen.getByText("Smoke test de despliegue")).toBeInTheDocument();
+    expect(screen.getByText("Enrutamiento semántico")).toBeInTheDocument();
+    expect(screen.getByText("Presentación determinista")).toBeInTheDocument();
+    expect(screen.getByText("Complemento de conjuntos")).toBeInTheDocument();
+    expect(screen.getByText("Reintento controlado")).toBeInTheDocument();
+    expect(screen.getAllByText("Circuit breaker")).toHaveLength(2);
+    expect(screen.getAllByText("Degradación controlada")).toHaveLength(2);
     expect(
-      await screen.findByRole("heading", { name: "Resilience policy" }),
+      await screen.findByRole("heading", { name: "Política de resiliencia" }),
     ).toBeInTheDocument();
     expect(await screen.findByText("list_employees")).toBeInTheDocument();
-    expect(screen.getByText("Semantic Robustness")).toBeInTheDocument();
-    expect(screen.getByText("Decision Validation")).toBeInTheDocument();
-    expect(screen.getByText("Repeated-run Stability")).toBeInTheDocument();
+    expect(screen.getByText("Robustez semántica")).toBeInTheDocument();
+    expect(screen.getByText("Validación de decisiones")).toBeInTheDocument();
+    expect(
+      screen.getByText("Estabilidad entre ejecuciones"),
+    ).toBeInTheDocument();
     expect(document.querySelectorAll(".concept-grid article")).toHaveLength(37);
   });
 });

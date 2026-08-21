@@ -164,12 +164,12 @@ export function createApp(
       },
       runtime: getAgent().resilienceSnapshot?.() ?? { state: "not_exposed" },
       semantics: {
-        timeout: "maximum duration per provider attempt",
-        retry: "bounded retry for transient provider failures",
+        timeout: "duración máxima por intento del proveedor",
+        retry: "reintento acotado ante fallas transitorias del proveedor",
         circuitBreaker:
-          "rejects provider calls while an unhealthy circuit is open",
+          "rechaza llamadas al proveedor mientras el circuito está abierto",
         gracefulDegradation:
-          "preserves grounded presentation when only final narration fails",
+          "conserva la presentación grounded cuando sólo falla la narración final",
       },
     });
   });
@@ -248,7 +248,7 @@ export function createApp(
     res.json({
       cases: EVAL_CATALOG,
       execution: "npm run evals:run",
-      mode: "privileged CLI with guaranteed fixture cleanup",
+      mode: "CLI privilegiada con limpieza garantizada de fixtures",
     });
   });
 

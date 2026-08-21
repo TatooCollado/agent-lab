@@ -14,29 +14,29 @@ export function EvalCatalog() {
   return (
     <section className="eval-page">
       <div className="index-heading">
-        <span className="eyebrow">Behavioral quality gates</span>
-        <h1>Agent evaluations</h1>
+        <span className="eyebrow">Controles de calidad del comportamiento</span>
+        <h1>Evaluaciones del agente</h1>
         <p>
-          Reproducible cases that measure grounding, empty-result behavior and
-          database freshness through observable invariants.
+          Casos reproducibles que miden grounding, resultados vacíos y frescura
+          de la base de datos mediante invariantes observables.
         </p>
       </div>
 
       {failed ? (
         <p className="query-error" role="alert">
-          The evaluation catalog is unavailable.
+          El catálogo de evaluaciones no está disponible.
         </p>
       ) : !catalog ? (
-        <p className="trace-empty">Loading evaluation contracts…</p>
+        <p className="trace-empty">Cargando contratos de evaluación…</p>
       ) : (
         <>
           <div className="eval-runtime">
             <div>
-              <span>Execution</span>
+              <span>Ejecución</span>
               <code>{catalog.execution}</code>
             </div>
             <div>
-              <span>Isolation mode</span>
+              <span>Modo de aislamiento</span>
               <code>{catalog.mode}</code>
             </div>
           </div>
@@ -44,18 +44,18 @@ export function EvalCatalog() {
             {catalog.cases.map((item, index) => (
               <article key={item.id}>
                 <div className="eval-card-top">
-                  <span>CASE {String(index + 1).padStart(2, "0")}</span>
+                  <span>CASO {String(index + 1).padStart(2, "0")}</span>
                   <code>{item.id}</code>
                 </div>
                 <h2>{item.title}</h2>
                 <p className="eval-technique">{item.technique}</p>
                 {item.execution && <code>{item.execution}</code>}
                 <div className="eval-prompt">
-                  <span>Prompt</span>
+                  <span>Consulta</span>
                   <p>{item.prompt}</p>
                 </div>
                 <div className="eval-invariants">
-                  <span>Assertions</span>
+                  <span>Verificaciones</span>
                   <ul>
                     {item.invariants.map((invariant) => (
                       <li key={invariant}>{invariant}</li>
@@ -65,16 +65,16 @@ export function EvalCatalog() {
               </article>
             ))}
           </div>
-          <div className="eval-pipeline" aria-label="Evaluation pipeline">
+          <div className="eval-pipeline" aria-label="Flujo de evaluación">
             <span>Dataset / fixture</span>
             <i>→</i>
-            <span>Agent + LLM</span>
+            <span>Agente + LLM</span>
             <i>→</i>
             <span>MCP + PostgreSQL</span>
             <i>→</i>
-            <span>Assertions</span>
+            <span>Verificaciones</span>
             <i>→</i>
-            <span>Cleanup</span>
+            <span>Limpieza</span>
           </div>
         </>
       )}

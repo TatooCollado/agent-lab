@@ -22,49 +22,49 @@ export function ResiliencePanel() {
       aria-labelledby="resilience-title"
     >
       <div className="index-heading">
-        <span className="eyebrow">Failure containment</span>
-        <h2 id="resilience-title">Resilience policy</h2>
+        <span className="eyebrow">Contención de fallas</span>
+        <h2 id="resilience-title">Política de resiliencia</h2>
         <p>
-          Bounded failure handling around the cloud LLM. PostgreSQL remains the
-          source of truth.
+          Manejo acotado de fallas alrededor del LLM en la nube. PostgreSQL
+          continúa siendo la fuente de verdad.
         </p>
       </div>
       {failed ? (
-        <p>Resilience contract unavailable.</p>
+        <p>El contrato de resiliencia no está disponible.</p>
       ) : !contract ? (
-        <p>Loading resilience contract…</p>
+        <p>Cargando contrato de resiliencia…</p>
       ) : (
         <div className="structured-table-wrap">
           <table className="structured-table">
             <thead>
               <tr>
-                <th>Technique</th>
-                <th>Configured policy</th>
-                <th>Technical behavior</th>
+                <th>Técnica</th>
+                <th>Política configurada</th>
+                <th>Comportamiento técnico</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Timeout budget</td>
-                <td>{contract.policy.timeoutMs} ms / attempt</td>
+                <td>Tiempo máximo</td>
+                <td>{contract.policy.timeoutMs} ms por intento</td>
                 <td>{contract.semantics.timeout}</td>
               </tr>
               <tr>
-                <td>Bounded retry</td>
-                <td>{contract.policy.transientRetries} retry</td>
+                <td>Reintento acotado</td>
+                <td>{contract.policy.transientRetries} reintento</td>
                 <td>{contract.semantics.retry}</td>
               </tr>
               <tr>
                 <td>Circuit breaker</td>
                 <td>
-                  {contract.policy.circuitFailureThreshold} failures /{" "}
+                  {contract.policy.circuitFailureThreshold} fallas /{" "}
                   {contract.policy.circuitResetMs} ms ·{" "}
                   <code>{circuitState}</code>
                 </td>
                 <td>{contract.semantics.circuitBreaker}</td>
               </tr>
               <tr>
-                <td>Graceful degradation</td>
+                <td>Degradación controlada</td>
                 <td>
                   <code>{contract.policy.finalizationFallback}</code>
                 </td>

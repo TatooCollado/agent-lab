@@ -1,5 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { clearHrData, createUser, listUsers, type UserRole, type UserSummary } from "./api";
+import {
+  clearHrData,
+  createUser,
+  listUsers,
+  type UserRole,
+  type UserSummary,
+} from "./api";
 
 export function AdminPanel() {
   const [users, setUsers] = useState<UserSummary[]>([]);
@@ -14,7 +20,9 @@ export function AdminPanel() {
   }
 
   useEffect(() => {
-    void refreshUsers().catch(() => setMessage("Unable to load users."));
+    void refreshUsers().catch(() =>
+      setMessage("No se pudieron cargar los usuarios."),
+    );
   }, []);
 
   async function submitUser(event: FormEvent) {
@@ -24,56 +32,120 @@ export function AdminPanel() {
       const user = await createUser({ username, password, role });
       setUsername("");
       setPassword("");
-      setMessage(`User ${user.username} created.`);
+      setMessage(`Usuario ${user.username} creado.`);
       await refreshUsers();
     } catch (error) {
-      setMessage(error instanceof Error && error.message === "username_exists" ? "Username already exists." : "User could not be created.");
+      setMessage(
+        error instanceof Error && error.message === "username_exists"
+          ? "El nombre de usuario ya existe."
+          : "No se pudo crear el usuario.",
+      );
     }
   }
 
   async function executeClear() {
     const deleted = await clearHrData();
     setConfirmation("");
-    setMessage(`HR data cleared: ${Object.values(deleted).reduce((sum, count) => sum + count, 0)} rows.`);
+    setMessage(
+      `Datos de RR. HH. eliminados: ${Object.values(deleted).reduce((sum, count) => sum + count, 0)} filas.`,
+    );
   }
 
   return (
     <section className="admin-page">
       <div className="index-heading">
-        <span className="eyebrow">Role-based access control</span>
-        <h1>Administration</h1>
-        <p>Controlled user provisioning and transactional HR data reset.</p>
+        <span className="eyebrow">Control de acceso basado en roles</span>
+        <h1>Administración</h1>
+        <p>
+          Alta controlada de usuarios y limpieza transaccional de datos de RR.
+          HH.
+        </p>
       </div>
-      {message && <p className="admin-message" role="status">{message}</p>}
+      {message && (
+        <p className="admin-message" role="status">
+          {message}
+        </p>
+      )}
       <div className="admin-grid">
         <section className="panel admin-panel">
-          <div className="panel-heading"><div><span className="eyebrow">Identity lifecycle</span><h2>Create user</h2></div></div>
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">Ciclo de vida de identidades</span>
+              <h2>Crear usuario</h2>
+            </div>
+          </div>
           <form onSubmit={(event) => void submitUser(event)}>
-            <label htmlFor="new-username">Username</label>
-            <input id="new-username" value={username} onChange={(event) => setUsername(event.target.value)} pattern="[a-zA-Z0-9._-]+" required />
-            <label htmlFor="new-password">Password</label>
-            <input id="new-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} minLength={12} required />
-            <label htmlFor="new-role">Role</label>
-            <select id="new-role" value={role} onChange={(event) => setRole(event.target.value as UserRole)}>
-              <option value="viewer">Viewer · read only</option>
-              <option value="admin">Admin</option>
+            <label htmlFor="new-username">Usuario</label>
+            <input
+              id="new-username"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              pattern="[a-zA-Z0-9._-]+"
+              required
+            />
+            <label htmlFor="new-password">Contraseña</label>
+            <input
+              id="new-password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              minLength={12}
+              required
+            />
+            <label htmlFor="new-role">Rol</label>
+            <select
+              id="new-role"
+              value={role}
+              onChange={(event) => setRole(event.target.value as UserRole)}
+            >
+              <option value="viewer">Consulta · sólo lectura</option>
+              <option value="admin">Administrador</option>
             </select>
-            <button className="run-button">Create user</button>
+            <button className="run-button">Crear usuario</button>
           </form>
         </section>
         <section className="panel admin-panel">
-          <div className="panel-heading"><div><span className="eyebrow">Authorization state</span><h2>Users</h2></div></div>
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">Estado de autorización</span>
+              <h2>Usuarios</h2>
+            </div>
+          </div>
           <div className="user-list">
-            {users.map((user) => <div key={user.id}><span>{user.username}</span><code>{user.role}</code><i>{user.active ? "active" : "disabled"}</i></div>)}
+            {users.map((user) => (
+              <div key={user.id}>
+                <span>{user.username}</span>
+                <code>{user.role}</code>
+                <i>{user.active ? "activo" : "deshabilitado"}</i>
+              </div>
+            ))}
           </div>
         </section>
       </div>
       <section className="danger-zone">
-        <span className="eyebrow">Destructive operation · audited</span>
-        <h2>Clear HR operational data</h2>
-        <p>Deletes attendance, employees and departments in one transaction. Schema, users and audit events are preserved.</p>
-        <label htmlFor="delete-confirmation">Type DELETE HR DATA to enable</label>
-        <div><input id="delete-confirmation" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} /><button disabled={confirmation !== "DELETE HR DATA"} onClick={() => void executeClear()}>Clear HR data</button></div>
+        <span className="eyebrow">Operación destructiva · auditada</span>
+        <h2>Eliminar datos operativos de RR. HH.</h2>
+        <p>
+          Elimina asistencias, empleados y departamentos dentro de una
+          transacción. Conserva el esquema, los usuarios y los eventos de
+          auditoría.
+        </p>
+        <label htmlFor="delete-confirmation">
+          Escribí DELETE HR DATA para habilitar
+        </label>
+        <div>
+          <input
+            id="delete-confirmation"
+            value={confirmation}
+            onChange={(event) => setConfirmation(event.target.value)}
+          />
+          <button
+            disabled={confirmation !== "DELETE HR DATA"}
+            onClick={() => void executeClear()}
+          >
+            Eliminar datos de RR. HH.
+          </button>
+        </div>
       </section>
     </section>
   );

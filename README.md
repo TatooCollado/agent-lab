@@ -300,8 +300,8 @@ npm run auth:smoke
 
 El proyecto implementa A2A Protocol 1.0 con el SDK oficial `@a2a-js/sdk`:
 
-- `HR Grounding Agent`: consultas de empleados y asistencia grounded mediante MCP;
-- `Absence Finance Agent`: análisis económico determinista de ausencias.
+- `Agente de RR. HH. con grounding`: consultas de empleados y asistencia mediante MCP;
+- `Agente financiero de ausencias`: análisis económico determinista de ausencias.
 
 Agent Cards:
 
@@ -332,7 +332,9 @@ La base no contiene salarios. Por eso el reporte exige parámetros explícitos: 
 días × costo diario × (1 + prima de reemplazo + impacto de productividad)
 ```
 
-El LLM no realiza la aritmética. Una función TypeScript determinista calcula importes redondeados a dos decimales. Si MCP indica que el resultado fue truncado, el agente rechaza el cálculo para evitar un reporte incompleto.
+El cálculo se presenta descompuesto como costo base, cobertura o reemplazo, pérdida de productividad e impacto total. El LLM no realiza la aritmética: una función TypeScript determinista calcula importes redondeados a dos decimales. Si MCP indica que el resultado fue truncado, el agente rechaza el cálculo para evitar un reporte incompleto.
+
+La interfaz empresarial está presentada en español. Conserva sin traducir únicamente identificadores técnicos reales —por ejemplo eventos `TraceEvent`, herramientas MCP, modelos, protocolos y payloads JSON— para que la demostración siga siendo verificable. La vista financiera explica por separado la delegación A2A, la consulta MCP, la fórmula aplicada y el artefacto devuelto.
 
 La implementación utiliza tareas A2A en memoria porque el flujo es breve y síncrono. Para múltiples instancias o tareas largas, el `TaskStore` deberá migrarse a almacenamiento persistente.
 

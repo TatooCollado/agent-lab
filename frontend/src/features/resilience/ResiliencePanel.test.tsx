@@ -43,9 +43,9 @@ describe("ResiliencePanel", () => {
     render(<ResiliencePanel />);
 
     expect(
-      await screen.findByRole("heading", { name: "Resilience policy" }),
+      await screen.findByRole("heading", { name: "Política de resiliencia" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("12000 ms / attempt")).toBeInTheDocument();
+    expect(screen.getByText("12000 ms por intento")).toBeInTheDocument();
     expect(screen.getByText("closed")).toBeInTheDocument();
     expect(screen.getByText("typed_answer_payload")).toBeInTheDocument();
   });

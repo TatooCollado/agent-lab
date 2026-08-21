@@ -62,7 +62,7 @@ describe("StructuredAnswer", () => {
     );
 
     expect(
-      screen.getByText("No records matched the query."),
+      screen.getByText("No se encontraron registros para la consulta."),
     ).toBeInTheDocument();
   });
 

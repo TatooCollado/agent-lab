@@ -1,10 +1,13 @@
 # Agent Lab
 
+[![CI](https://github.com/TatooCollado/agent-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/TatooCollado/agent-lab/actions/workflows/ci.yml)
+[![Production Smoke](https://github.com/TatooCollado/agent-lab/actions/workflows/production-smoke.yml/badge.svg)](https://github.com/TatooCollado/agent-lab/actions/workflows/production-smoke.yml)
+
 Aplicación educativa para inspeccionar el flujo técnico de agentes de IA sobre datos empresariales. El proyecto muestra contratos, protocolos, llamadas a herramientas, resultados estructurados y trazas sanitizadas.
 
 ## Estado
 
-Etapas 1 a 6 — Fundación, MCP Server, Agent Runtime, Auth/RBAC, colaboración A2A y evaluaciones:
+Etapas 1 a 8 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, cloud y entrega automatizada:
 
 - frontend React + Vite;
 - backend Node.js + Express;
@@ -33,7 +36,7 @@ Etapas 1 a 6 — Fundación, MCP Server, Agent Runtime, Auth/RBAC, colaboración
 - casos de referencia, resultado vacío y frescura de PostgreSQL;
 - fixture dinámica aislada con limpieza garantizada y verificación residual.
 
-La configuración declarativa de deployment está preparada; falta aprovisionar los recursos externos.
+La aplicación está desplegada con frontend estático en Render, backend serverless en Vercel y PostgreSQL en Neon. GitHub Actions aplica quality gates y smoke tests contra producción.
 
 ## Estructura
 
@@ -344,3 +347,31 @@ A2A_INTERNAL_TOKEN=<secret-aleatorio-de-32-o-mas-caracteres>
 ```
 
 El backend público añade headers con Helmet, rate limits, manejo explícito de errores y `GET /api/health`. Los límites en memoria son demostrativos y operan por instancia caliente; una aplicación productiva distribuida usaría un store compartido. PostgreSQL conserva usuarios, sesiones y datos, por lo que el filesystem serverless permanece descartable.
+
+## CI/CD y quality gates
+
+Cada `push` a `main` y cada pull request ejecutan `.github/workflows/ci.yml`. Backend y frontend se validan en jobs independientes y reproducibles sobre Node.js 22:
+
+```text
+checkout → npm ci → typecheck → build → tests → audit de dependencias productivas
+```
+
+`npm ci` instala exactamente el árbol fijado por cada `package-lock.json`. Los jobs sólo poseen permiso de lectura del repositorio, tienen timeout y cancelan ejecuciones anteriores de la misma rama. Ninguna credencial de producción se entrega al workflow de CI.
+
+Vercel está conectado al repositorio con `backend/` como Root Directory; un commit aceptado en `main` genera el despliegue serverless. Render mantiene el frontend estático desde `frontend/`. Esta separación distingue dos controles:
+
+- **quality gate previo al runtime:** tipos, compilación, tests y auditoría;
+- **smoke test posterior al deployment:** contrato HTTP público realmente desplegado.
+
+`.github/workflows/production-smoke.yml` escucha estados exitosos de deployment y también permite ejecución manual. `scripts/production-smoke.mjs` comprueba:
+
+- health directo del backend Vercel;
+- contrato de `/api/system` y etapa vigente;
+- proxy `/api/*` servido bajo el origen Render;
+- disponibilidad del documento HTML del frontend.
+
+Ejecución local del mismo contrato de producción:
+
+```bash
+node scripts/production-smoke.mjs
+```

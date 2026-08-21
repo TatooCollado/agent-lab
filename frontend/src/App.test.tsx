@@ -141,4 +141,22 @@ describe("App", () => {
     expect(screen.getByText("fixture always cleaned")).toBeInTheDocument();
     expect(screen.queryByText(/¿Por qué existe este paso?/i)).not.toBeInTheDocument();
   });
+
+  it("presents the automated delivery concepts in the system index", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockImplementation((input: string) => Promise.resolve({
+      ok: true,
+      json: async () => input === "/api/auth/me"
+        ? { user: { id: "u1", username: "viewer", role: "viewer" } }
+        : { cards: [] }
+    })));
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "System index" }));
+
+    expect(await screen.findByRole("heading", { name: "System index" })).toBeInTheDocument();
+    expect(screen.getByText("CI/CD")).toBeInTheDocument();
+    expect(screen.getByText("Quality Gates")).toBeInTheDocument();
+    expect(screen.getByText("Deployment Smoke Test")).toBeInTheDocument();
+    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(24);
+  });
 });

@@ -72,7 +72,7 @@ export function createApp(options: {
 
   app.get("/api/system", (_req, res) => {
     res.json({
-      stage: 7,
+      stage: 8,
       timezone: env.APP_TIMEZONE,
       components: [
         "React",
@@ -95,6 +95,11 @@ export function createApp(options: {
         "Vercel Functions",
         "Fluid Compute",
         "Region-aware serverless deployment",
+        "GitHub Actions",
+        "CI/CD pipeline",
+        "Quality gates",
+        "Deployment smoke tests",
+        "Vercel Git integration",
         "Groq cloud inference",
         "HTTP security headers",
         "Rate limiting",

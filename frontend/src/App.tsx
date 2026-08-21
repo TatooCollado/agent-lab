@@ -12,8 +12,8 @@ import { FinanceLab } from "./features/finance/FinanceLab";
 const concepts = [
   ["01", "Source of Truth", "PostgreSQL · Neon"],
   ["02", "Structured Outputs", "Zod + MCP structuredContent"],
-  ["03", "Tool Calling", "Ollama · qwen3:8b"],
-  ["04", "MCP", "Client + Server · stdio"],
+  ["03", "Tool Calling", "Groq GPT-OSS 20B · Ollama local"],
+  ["04", "MCP", "Client + Server · stdio / in-process"],
   ["05", "Grounding", "Required tool call + system prompt"],
   ["06", "Guardrails", "Allowlist + read-only database role"],
   ["07", "Observability", "Sanitized TraceEvent stream"],
@@ -25,9 +25,15 @@ const concepts = [
   ["13", "Evaluation", "Dataset + deterministic assertions"],
   ["14", "Negative Testing", "Empty result · no hallucination"],
   ["15", "Freshness Test", "Dynamic fixture + guaranteed cleanup"],
-  ["16", "Infrastructure as Code", "Render Blueprint · render.yaml"],
+  ["16", "Infrastructure as Code", "Render Blueprint + Vercel Config"],
   ["17", "Cloud Inference", "Groq Free Plan · GPT-OSS 20B"],
-  ["18", "Public API Protection", "Helmet + IP rate limiting"]
+  ["18", "Public API Protection", "Helmet + IP rate limiting"],
+  ["19", "Serverless Runtime", "Express → Vercel Function"],
+  ["20", "Fluid Compute", "Warm instances + dynamic concurrency"],
+  ["21", "Transport Selection", "MCP stdio local · in-process cloud"],
+  ["22", "CI/CD", "GitHub Actions + Vercel Git integration"],
+  ["23", "Quality Gates", "Typecheck + build + tests + audit"],
+  ["24", "Deployment Smoke Test", "API + proxy + frontend contract"]
 ];
 
 function errorMessage(code: string): string {
@@ -104,7 +110,7 @@ export function App() {
           {user.role === "admin" && <button className={activeView === "admin" ? "active" : ""} onClick={() => setActiveView("admin")}>Admin</button>}
         </nav>
         <div className="session-chip"><span>{user.username}</span><code>{user.role}</code><button onClick={() => void signOut()}>Sign out</button></div>
-        <div className="stage-badge">Stage 07 · Deployment preparation</div>
+        <div className="stage-badge">Stage 08 · Automated delivery</div>
       </header>
 
       <main id="top">

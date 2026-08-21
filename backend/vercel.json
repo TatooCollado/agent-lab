@@ -4,7 +4,7 @@
   "buildCommand": "npm run build",
   "regions": ["gru1"],
   "functions": {
-    "src/server.ts": {
+    "src/app.ts": {
       "maxDuration": 300
     }
   }

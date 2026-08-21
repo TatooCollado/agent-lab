@@ -289,3 +289,12 @@ export function createApp(options: {
 
   return app;
 }
+
+let serverlessApp: ReturnType<typeof createApp> | null = null;
+
+const serverlessHandler: express.RequestHandler = (req, res, next) => {
+  serverlessApp ??= createApp();
+  serverlessApp(req, res, next);
+};
+
+export default serverlessHandler;

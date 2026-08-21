@@ -311,7 +311,7 @@ El repositorio conserva `frontend/` y `backend/` separados, con dos superficies 
 
 `render.yaml` sólo administra el frontend y reescribe `/api/*` hacia `https://agent-lab-api-ignac.vercel.app`. Para el navegador, autenticación y cookies continúan bajo el origen del frontend; el token de sesión permanece `HttpOnly` y no se expone a React.
 
-`backend/vercel.json` declara Express, un máximo de 300 segundos y la región `gru1` (São Paulo), cercana a la base Neon. Vercel detecta `src/server.ts` por su exportación default. El mismo archivo conserva `app.listen()` fuera de Vercel para desarrollo local.
+`backend/vercel.json` declara Express, un máximo de 300 segundos y la región `gru1` (São Paulo), cercana a la base Neon. Vercel detecta el handler lazy exportado por `src/app.ts`; la aplicación y sus pools se inicializan al recibir la primera request de una instancia. `src/server.ts` conserva `app.listen()` para desarrollo local.
 
 El transporte MCP se selecciona mediante `MCP_TRANSPORT`:
 

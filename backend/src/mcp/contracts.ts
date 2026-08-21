@@ -30,6 +30,8 @@ export const countEmployeesOutputSchema = resultMetadataSchema.extend({
   inactive: z.number().int().nonnegative(),
 });
 
+export const listEmployeesInputSchema = z.object({});
+
 export const summarizeEmployeeDelaysInputSchema = z.object({
   query: z
     .string()
@@ -65,6 +67,10 @@ export const employeeRecordSchema = z.object({
   departmentName: z.string(),
   timezone: z.string(),
   active: z.boolean(),
+});
+
+export const listEmployeesOutputSchema = resultMetadataSchema.extend({
+  records: z.array(employeeRecordSchema),
 });
 
 export const lateArrivalRecordSchema = z.object({
@@ -114,6 +120,7 @@ export const absencesOutputSchema = resultMetadataSchema.extend({
 
 export type FindEmployeeInput = z.infer<typeof findEmployeeInputSchema>;
 export type CountEmployeesOutput = z.infer<typeof countEmployeesOutputSchema>;
+export type ListEmployeesOutput = z.infer<typeof listEmployeesOutputSchema>;
 export type SummarizeEmployeeDelaysInput = z.infer<
   typeof summarizeEmployeeDelaysInputSchema
 >;

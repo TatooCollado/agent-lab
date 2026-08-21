@@ -17,7 +17,7 @@ const concepts = [
   ["01", "Source of Truth", "PostgreSQL · Neon"],
   ["02", "Structured Outputs", "Zod + MCP structuredContent"],
   ["03", "Tool Calling", "Groq GPT-OSS 20B · Ollama local"],
-  ["04", "MCP", "Client + Server · 5 read-only tools"],
+  ["04", "MCP", "Client + Server · 6 read-only tools"],
   ["05", "Grounding", "Required tool call + system prompt"],
   ["06", "Guardrails", "Allowlist + read-only database role"],
   ["07", "Observability", "Sanitized TraceEvent stream"],

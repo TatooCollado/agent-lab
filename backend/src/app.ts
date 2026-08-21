@@ -88,6 +88,7 @@ export function createApp(
         "MCP Client",
         "MCP Server",
         "Purpose-built employee count tool",
+        "Purpose-built employee directory tool",
         "Purpose-built employee delay aggregation tool",
         "MCP stdio transport (local)",
         "MCP in-process transport (serverless)",

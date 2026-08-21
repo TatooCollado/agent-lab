@@ -147,6 +147,7 @@ No se mostrarán credenciales, tokens de sesión ni razonamiento interno del mod
 El servidor utiliza el SDK oficial de Model Context Protocol para exponer:
 
 - `count_employees`: cuenta empleados totales, activos e inactivos;
+- `list_employees`: lista el directorio completo con legajo, nombre, departamento y estado;
 - `find_employee`: busca por nombre o número de empleado;
 - `summarize_employee_delays`: agrega las tardanzas históricas de una persona por nombre o legajo;
 - `list_late_arrivals`: lista llegadas tarde por período y empleado opcional;

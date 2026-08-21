@@ -13,6 +13,21 @@ function repository(): HrRepository {
     countEmployees: vi
       .fn()
       .mockResolvedValue({ total: 8, active: 7, inactive: 1 }),
+    listEmployees: vi.fn().mockResolvedValue({
+      records: [
+        {
+          employeeId: "550e8400-e29b-41d4-a716-446655440000",
+          employeeNumber: "EMP-001",
+          fullName: "Ana Torres",
+          departmentCode: "ENG",
+          departmentName: "Engineering",
+          timezone,
+          active: true,
+        },
+      ],
+      total: 1,
+      truncated: false,
+    }),
     summarizeEmployeeDelays: vi.fn().mockResolvedValue({
       records: [
         {
@@ -62,6 +77,25 @@ describe("HrToolService", () => {
       inactive: 1,
       truncated: false,
     });
+  });
+
+  it("returns the complete employee directory contract", async () => {
+    const repo = repository();
+    const service = new HrToolService(repo, timezone, () => fixedNow);
+
+    await expect(service.listEmployees()).resolves.toMatchObject({
+      source: "postgresql",
+      count: 1,
+      total: 1,
+      records: [
+        {
+          employeeNumber: "EMP-001",
+          fullName: "Ana Torres",
+          active: true,
+        },
+      ],
+    });
+    expect(repo.listEmployees).toHaveBeenCalledTimes(1);
   });
 
   it("returns an explicit empty collection for a search without matches", async () => {

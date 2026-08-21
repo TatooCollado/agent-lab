@@ -59,6 +59,7 @@ export type EmployeeDelaySummaryRecord = {
 
 export interface HrRepository {
   countEmployees(): Promise<EmployeeCount>;
+  listEmployees(): Promise<LimitedResult<EmployeeDirectoryRecord>>;
   summarizeEmployeeDelays(
     query: string,
   ): Promise<LimitedResult<EmployeeDelaySummaryRecord>>;
@@ -110,6 +111,45 @@ export class PostgresHrRepository implements HrRepository {
       active: Number(row?.active ?? 0),
       inactive: Number(row?.inactive ?? 0),
     };
+  }
+
+  async listEmployees(): Promise<LimitedResult<EmployeeDirectoryRecord>> {
+    type Row = {
+      employee_id: string;
+      employee_number: string;
+      full_name: string;
+      department_code: string;
+      department_name: string;
+      timezone: string;
+      active: boolean;
+      total_count: string;
+    };
+
+    const result = await this.pool.query<Row>(
+      `SELECT
+         id AS employee_id,
+         employee_number,
+         full_name,
+         department_code,
+         department_name,
+         timezone,
+         active,
+         count(*) OVER ()::text AS total_count
+       FROM hr_employee_directory
+       ORDER BY active DESC, full_name, employee_number
+       LIMIT $1`,
+      [SEARCH_LIMIT],
+    );
+
+    return limitedResult(result.rows, SEARCH_LIMIT, (row) => ({
+      employeeId: row.employee_id,
+      employeeNumber: row.employee_number,
+      fullName: row.full_name,
+      departmentCode: row.department_code,
+      departmentName: row.department_name,
+      timezone: row.timezone,
+      active: row.active,
+    }));
   }
 
   async summarizeEmployeeDelays(

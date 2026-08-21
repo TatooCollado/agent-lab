@@ -13,8 +13,8 @@ const periodProperty = {
 
 export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
   new Map([
-    [
-      "count_employees",
+  [
+    "count_employees",
       {
         type: "function",
         name: "count_employees",
@@ -48,6 +48,22 @@ export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
         },
         strict: true,
       },
+  ],
+  [
+    "list_employees",
+    {
+      type: "function",
+      name: "list_employees",
+      description:
+        "Lista todos los empleados con legajo, nombre, departamento y estado. Usala para preguntas como '¿quiénes son los empleados?' o 'mostrame la nómina'.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+        additionalProperties: false,
+      },
+      strict: true,
+    },
   ],
   [
     "summarize_employee_delays",

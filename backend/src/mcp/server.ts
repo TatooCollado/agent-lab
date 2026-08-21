@@ -7,6 +7,8 @@ import {
   findEmployeeInputSchema,
   findEmployeeOutputSchema,
   lateArrivalsOutputSchema,
+  listEmployeesInputSchema,
+  listEmployeesOutputSchema,
   periodInputSchema,
   summarizeEmployeeDelaysInputSchema,
   summarizeEmployeeDelaysOutputSchema,
@@ -66,6 +68,19 @@ export function createHrMcpServer(
       annotations: readOnlyAnnotations,
     },
     async () => executeTool(() => service.countEmployees()),
+  );
+
+  server.registerTool(
+    "list_employees",
+    {
+      title: "Listar empleados",
+      description:
+        "Lista el directorio completo de empleados desde PostgreSQL con legajo, nombre, departamento y estado.",
+      inputSchema: listEmployeesInputSchema,
+      outputSchema: listEmployeesOutputSchema,
+      annotations: readOnlyAnnotations,
+    },
+    async () => executeTool(() => service.listEmployees()),
   );
 
   server.registerTool(

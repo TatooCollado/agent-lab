@@ -6,6 +6,7 @@ import type {
   FindEmployeeInput,
   FindEmployeeOutput,
   LateArrivalsOutput,
+  ListEmployeesOutput,
   PeriodInput,
   SummarizeEmployeeDelaysInput,
   SummarizeEmployeeDelaysOutput,
@@ -29,6 +30,19 @@ export class HrToolService {
       truncated: false,
       active: result.active,
       inactive: result.inactive,
+    };
+  }
+
+  async listEmployees(): Promise<ListEmployeesOutput> {
+    const queriedAt = this.now().toISOString();
+    const result = await this.repository.listEmployees();
+    return {
+      source: "postgresql",
+      queriedAt,
+      count: result.records.length,
+      total: result.total,
+      truncated: result.truncated,
+      records: result.records,
     };
   }
 

@@ -5,6 +5,7 @@ const expectedTools = [
   "count_employees",
   "find_employee",
   "list_absences",
+  "list_employees",
   "list_late_arrivals",
   "summarize_employee_delays",
 ];
@@ -67,6 +68,17 @@ try {
     throw new Error("Employee delay summary contract failed");
   }
 
+  const employeeDirectory = structured(
+    await client.callTool({ name: "list_employees", arguments: {} }),
+  );
+  if (
+    employeeDirectory.source !== "postgresql" ||
+    employeeDirectory.count !== 3 ||
+    !Array.isArray(employeeDirectory.records)
+  ) {
+    throw new Error("Employee directory contract failed");
+  }
+
   const lateArrivals = structured(
     await client.callTool({
       name: "list_late_arrivals",
@@ -102,6 +114,7 @@ try {
       status: "ok",
       tools: names,
       employeeCount: employeeCount.total,
+      listedEmployees: employeeDirectory.count,
       brunoTotalLateMinutes: delayRecord.totalLateMinutes,
       previousMonthLateArrivals: lateArrivals.count,
       currentMonthAbsences: absences.count,

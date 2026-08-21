@@ -96,6 +96,34 @@ if (
   );
 }
 
+const employeeDirectoryResult = await agent.run(
+  "¿Quiénes son los empleados?",
+  randomUUID(),
+);
+const employeeDirectoryEvent = employeeDirectoryResult.trace.find(
+  (item) => item.name === "mcp.tool.call.completed",
+);
+const employeeDirectoryOutput = employeeDirectoryEvent?.output as
+  | Record<string, unknown>
+  | undefined;
+if (
+  !employeeDirectoryResult.grounded ||
+  !employeeDirectoryResult.toolsUsed.includes("list_employees") ||
+  employeeDirectoryOutput?.source !== "postgresql" ||
+  employeeDirectoryOutput.count !== 3 ||
+  !Array.isArray(employeeDirectoryOutput.records)
+) {
+  throw new Error(
+    `Groq employee directory mismatch: ${JSON.stringify({
+      model: employeeDirectoryResult.model,
+      grounded: employeeDirectoryResult.grounded,
+      toolsUsed: employeeDirectoryResult.toolsUsed,
+      source: employeeDirectoryOutput?.source,
+      databaseCount: employeeDirectoryOutput?.count,
+    })}`,
+  );
+}
+
 console.info(
   JSON.stringify({
     status: "ok",
@@ -122,6 +150,13 @@ console.info(
         totalLateMinutes: employeeDelayRecord.totalLateMinutes,
         answer: employeeDelayResult.answer,
         traceEvents: employeeDelayResult.trace.length,
+      },
+      {
+        question: "employee-directory",
+        toolsUsed: employeeDirectoryResult.toolsUsed,
+        databaseCount: employeeDirectoryOutput.count,
+        answer: employeeDirectoryResult.answer,
+        traceEvents: employeeDirectoryResult.trace.length,
       },
     ],
   }),

@@ -334,7 +334,7 @@ días × costo diario × (1 + prima de reemplazo + impacto de productividad)
 
 El cálculo se presenta descompuesto como costo base, cobertura o reemplazo, pérdida de productividad e impacto total. El LLM no realiza la aritmética: una función TypeScript determinista calcula importes redondeados a dos decimales. Si MCP indica que el resultado fue truncado, el agente rechaza el cálculo para evitar un reporte incompleto.
 
-La interfaz empresarial está presentada en español. Conserva sin traducir únicamente identificadores técnicos reales —por ejemplo eventos `TraceEvent`, herramientas MCP, modelos, protocolos y payloads JSON— para que la demostración siga siendo verificable. La vista financiera explica por separado la delegación A2A, la consulta MCP, la fórmula aplicada y el artefacto devuelto.
+La interfaz empresarial está presentada en español. Conserva sin traducir únicamente identificadores técnicos reales —por ejemplo eventos `TraceEvent`, herramientas MCP, modelos, protocolos y payloads JSON— para que la demostración siga siendo verificable. La vista financiera explica por separado la delegación A2A, la consulta MCP, la fórmula aplicada y el artefacto devuelto. Los escenarios Conservador, Base y Alto impacto cargan hipótesis didácticas visibles; la interfaz aclara que no provienen de Neon, MCP, Groq, el LLM ni un benchmark sectorial y permite reemplazarlas por valores propios.
 
 La implementación utiliza tareas A2A en memoria porque el flujo es breve y síncrono. Para múltiples instancias o tareas largas, el `TaskStore` deberá migrarse a almacenamiento persistente.
 
@@ -374,6 +374,20 @@ npm run semantic:stability
 `semantic:eval` recorre una vez los 80 casos y `semantic:stability` repite cinco veces el conjunto crítico. Ambos informan `validDecisionRate`, `intentRecognitionRate`, `toolSelectionRate`, `argumentExtractionRate`, `temporalInterpretationRate`, `exactOutcomeRate`, `stabilityRate`, `ambiguityPassRate` y `unsupportedPassRate`. Por defecto esperan 30 segundos entre llamadas para respetar el presupuesto gratuito de tokens de Groq y separar límites del proveedor de inestabilidad semántica. El baseline Stage 10 se conserva en `backend/evals/baselines/` y los resultados Stage 11 en `backend/evals/results/`.
 
 Los demás comandos devuelven JSON reproducible con `passRate`, duración, checks esperados/reales y evidencia grounded por caso. Finalizan con código distinto de cero si falla una evaluación o si queda alguna fixture temporal. El caso de referencia presupone que el seed de demostración está presente.
+
+## Explorador de datos y CRUD de demostración
+
+La Etapa 12 incorpora una superficie controlada para que una empresa pruebe cómo los cambios operativos afectan las consultas del agente. No es un administrador genérico de PostgreSQL: expone únicamente `departments`, `employees` y `attendance_records` mediante endpoints tipados.
+
+- `viewer` puede consultar el snapshot operativo, pero recibe `403` ante cualquier escritura;
+- `admin` puede crear, editar y eliminar registros;
+- cada payload se valida con Zod y cada valor llega a PostgreSQL como parámetro SQL;
+- las escrituras usan la conexión administrativa dentro de una transacción y generan un `audit_event`;
+- claves foráneas y unicidad evitan datos huérfanos o duplicados;
+- `app_users`, `app_sessions` y `audit_events` no se entregan al navegador;
+- no existe editor de SQL libre.
+
+Las lecturas se ejecutan con `DATABASE_READONLY_URL`; las mutaciones usan `DATABASE_ADMIN_URL`. El listado de asistencia está acotado a los 200 registros más recientes para mantener una respuesta previsible en la demostración.
 
 ## Deployment cloud
 

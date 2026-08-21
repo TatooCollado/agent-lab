@@ -12,6 +12,13 @@ const periodLabels: Record<FinanceReportInput["period"], string> = {
   last_30_days: "Últimos 30 días",
 };
 
+type Scenario = "conservative" | "base" | "high" | "custom";
+const scenarios: Record<Exclude<Scenario, "custom">, { label: string; replacement: string; productivity: string; description: string }> = {
+  conservative: { label: "Conservador", replacement: "15", productivity: "10", description: "Menor costo indirecto ilustrativo." },
+  base: { label: "Base", replacement: "35", productivity: "20", description: "Punto medio para recorrer la demo." },
+  high: { label: "Alto impacto", replacement: "60", productivity: "35", description: "Mayor presión operativa ilustrativa." },
+};
+
 function formatMoney(value: number, currency: string): string {
   return new Intl.NumberFormat("es-AR", {
     style: "currency",
@@ -35,6 +42,7 @@ export function FinanceLab() {
   const [dailyCost, setDailyCost] = useState("");
   const [replacementRate, setReplacementRate] = useState("");
   const [productivityRate, setProductivityRate] = useState("");
+  const [scenario, setScenario] = useState<Scenario>("custom");
   const [result, setResult] = useState<FinanceWorkflowResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
@@ -68,6 +76,12 @@ export function FinanceLab() {
     } finally {
       setRunning(false);
     }
+  }
+
+  function applyScenario(next: Exclude<Scenario, "custom">) {
+    setScenario(next);
+    setReplacementRate(scenarios[next].replacement);
+    setProductivityRate(scenarios[next].productivity);
   }
 
   return (
@@ -167,6 +181,23 @@ export function FinanceLab() {
                 </option>
               ))}
             </select>
+            <fieldset className="scenario-selector">
+              <legend>Escenario de costos indirectos</legend>
+              <div>
+                {(Object.entries(scenarios) as [Exclude<Scenario, "custom">, (typeof scenarios)["base"]][]).map(([value, item]) => (
+                  <button key={value} type="button" className={scenario === value ? "active" : ""} onClick={() => applyScenario(value)}>
+                    <strong>{item.label}</strong>
+                    <span>{item.replacement}% reemplazo · {item.productivity}% productividad</span>
+                    <small>{item.description}</small>
+                  </button>
+                ))}
+              </div>
+              <p>
+                Son hipótesis didácticas del escenario: no provienen de Neon,
+                MCP, Groq, el LLM ni un benchmark sectorial. Deben reemplazarse
+                por valores definidos por Finanzas para una aplicación real.
+              </p>
+            </fieldset>
             <div className="finance-fields">
               <div>
                 <label htmlFor="currency">Moneda</label>
@@ -205,7 +236,7 @@ export function FinanceLab() {
                   max="200"
                   step="0.01"
                   value={replacementRate}
-                  onChange={(event) => setReplacementRate(event.target.value)}
+                  onChange={(event) => { setReplacementRate(event.target.value); setScenario("custom"); }}
                   placeholder="Obligatorio"
                   required
                 />
@@ -225,7 +256,7 @@ export function FinanceLab() {
                   max="100"
                   step="0.01"
                   value={productivityRate}
-                  onChange={(event) => setProductivityRate(event.target.value)}
+                  onChange={(event) => { setProductivityRate(event.target.value); setScenario("custom"); }}
                   placeholder="Obligatorio"
                   required
                 />

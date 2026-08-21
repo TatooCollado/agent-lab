@@ -21,7 +21,7 @@ assert.equal(directHealth.status, "ok");
 assert.equal(directHealth.service, "agent-lab-backend");
 
 const system = await (await request("/api/system")).json();
-assert.equal(system.stage, 11);
+assert.equal(system.stage, 12);
 assert.deepEqual(system.pending, []);
 assert.ok(system.components.includes("GitHub Actions"));
 assert.ok(system.components.includes("Deployment smoke tests"));

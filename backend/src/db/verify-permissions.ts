@@ -29,10 +29,15 @@ const adminPool = createPool("admin");
 
 try {
   const visibleRows = await readonlyPool.query("SELECT count(*)::integer AS count FROM hr_late_arrivals");
+  const visibleDepartments = await readonlyPool.query("SELECT count(*)::integer AS count FROM departments");
   const results = [
     {
       check: "readonly can query approved HR view",
       passed: visibleRows.rows[0]?.count >= 0
+    },
+    {
+      check: "readonly can query curated operational tables",
+      passed: visibleDepartments.rows[0]?.count >= 0
     },
     await expectDenied(
       readonlyPool,
@@ -55,4 +60,3 @@ try {
 } finally {
   await Promise.all([readonlyPool.end(), adminPool.end()]);
 }
-

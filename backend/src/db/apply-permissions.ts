@@ -69,6 +69,8 @@ try {
 
       GRANT SELECT ON hr_employee_directory, hr_late_arrivals, hr_absences
         TO app_readonly;
+      GRANT SELECT ON departments, employees, attendance_records
+        TO app_readonly;
 
       GRANT SELECT, INSERT, UPDATE ON app_users
         TO app_admin;

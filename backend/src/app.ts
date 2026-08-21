@@ -26,6 +26,11 @@ import { financeReportInputSchema } from "./finance/contracts.js";
 import { EVAL_CATALOG } from "./evals/catalog.js";
 import { agentRateLimit, loginRateLimit } from "./security/rate-limits.js";
 import { ProviderResilienceError } from "./resilience/provider-resilience.js";
+import { createDataExplorerRouter } from "./data-explorer/router.js";
+import {
+  PostgresDataExplorerService,
+  type DataExplorerService,
+} from "./data-explorer/service.js";
 
 const SESSION_COOKIE = "agent_lab_session";
 const createHelmet =
@@ -48,11 +53,16 @@ export function createApp(
     agent?: AgentRunner;
     auth?: AuthService;
     financeCoordinator?: FinanceCoordinator;
+    dataExplorer?: DataExplorerService;
   } = {},
 ) {
   const env = loadEnv();
   const app = express();
   const auth = options.auth ?? new DatabaseAuthService(env.SESSION_TTL_HOURS);
+  let defaultDataExplorer: DataExplorerService | null = null;
+  const getDataExplorer = () =>
+    options.dataExplorer ??
+    (defaultDataExplorer ??= new PostgresDataExplorerService());
   let defaultAgent: AgentRunner | null = null;
   const getAgent = () =>
     options.agent ?? (defaultAgent ??= createDefaultAgent());
@@ -89,7 +99,7 @@ export function createApp(
 
   app.get("/api/system", (_req, res) => {
     res.json({
-      stage: 11,
+      stage: 12,
       timezone: env.APP_TIMEZONE,
       components: [
         "React",
@@ -136,6 +146,10 @@ export function createApp(
         "Circuit breaker",
         "Graceful structured-response degradation",
         "Controlled fault injection",
+        "Scenario-based financial assumptions",
+        "RBAC-protected CRUD explorer",
+        "Parameterized operational data API",
+        "Audited database mutations",
       ],
       pending: [],
     });
@@ -220,6 +234,11 @@ export function createApp(
   app.get("/api/auth/me", requireSession, (_req, res) => {
     res.json({ user: res.locals.user });
   });
+
+  app.use(
+    "/api/data-explorer",
+    createDataExplorerRouter(requireSession, requireAdmin, getDataExplorer),
+  );
 
   app.post("/api/auth/logout", requireSession, async (_req, res) => {
     await auth.logout(res.locals.sessionToken as string);

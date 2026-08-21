@@ -15,6 +15,7 @@ import { EvalCatalog } from "./features/evals/EvalCatalog";
 import { AgentRegistry } from "./features/finance/AgentRegistry";
 import { FinanceLab } from "./features/finance/FinanceLab";
 import { ResiliencePanel } from "./features/resilience/ResiliencePanel";
+import { DataExplorer } from "./features/data-explorer/DataExplorer";
 
 const concepts = [
   ["01", "Fuente de verdad", "PostgreSQL · Neon"],
@@ -74,6 +75,18 @@ const concepts = [
     "Intención · herramienta · argumentos · período",
   ],
   ["37", "Comparación con baseline", "Etapa 10 antes → Etapa 11 después"],
+  [
+    "38",
+    "Modelado de escenarios",
+    "Supuestos financieros explícitos y editables",
+  ],
+  ["39", "API CRUD tipada", "Zod + SQL parametrizado + claves foráneas"],
+  [
+    "40",
+    "Explorador de datos",
+    "Tablas operativas permitidas · sin SQL libre",
+  ],
+  ["41", "RBAC de escritura", "Consulta para viewer · CRUD auditado para admin"],
 ];
 
 function errorMessage(error: unknown): string {
@@ -110,7 +123,7 @@ function errorMessage(error: unknown): string {
 
 export function App() {
   const [activeView, setActiveView] = useState<
-    "lab" | "finance" | "evals" | "system" | "admin"
+    "lab" | "finance" | "data" | "evals" | "system" | "admin"
   >("lab");
   const [user, setUser] = useState<SessionUser | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
@@ -189,6 +202,12 @@ export function App() {
             Finanzas
           </button>
           <button
+            className={activeView === "data" ? "active" : ""}
+            onClick={() => setActiveView("data")}
+          >
+            Datos
+          </button>
+          <button
             className={activeView === "evals" ? "active" : ""}
             onClick={() => setActiveView("evals")}
           >
@@ -214,7 +233,7 @@ export function App() {
           <code>{user.role}</code>
           <button onClick={() => void signOut()}>Cerrar sesión</button>
         </div>
-        <div className="stage-badge">Etapa 11 · Robustez semántica</div>
+        <div className="stage-badge">Etapa 12 · Demostración empresarial</div>
       </header>
 
       <main id="top">
@@ -322,6 +341,8 @@ export function App() {
           </>
         ) : activeView === "finance" ? (
           <FinanceLab />
+        ) : activeView === "data" ? (
+          <DataExplorer role={user.role} />
         ) : activeView === "evals" ? (
           <EvalCatalog />
         ) : activeView === "system" ? (

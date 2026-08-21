@@ -853,6 +853,47 @@ pre {
 .finance-input form > select {
   width: 100%;
 }
+.scenario-selector {
+  margin: 18px 0 0;
+  padding: 0;
+  border: 0;
+}
+.scenario-selector legend {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font: 400 9px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.scenario-selector > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.scenario-selector button {
+  display: grid;
+  gap: 6px;
+  min-height: 96px;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: #07110e;
+  color: var(--text);
+}
+.scenario-selector button.active {
+  border-color: var(--lime);
+  background: rgba(199, 243, 107, 0.06);
+}
+.scenario-selector button strong { font-size: 10px; }
+.scenario-selector button span { color: var(--lime); font: 300 8px var(--mono); }
+.scenario-selector button small { color: var(--muted); font: 300 8px/1.4 var(--mono); }
+.scenario-selector > p {
+  margin: 9px 0 0;
+  padding: 10px;
+  border-left: 2px solid var(--lime);
+  color: var(--muted);
+  font: 300 8px/1.6 var(--mono);
+}
 .finance-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1012,6 +1053,94 @@ pre {
 .agent-registry {
   margin-top: 54px;
 }
+
+.data-hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 28px;
+}
+.data-hero h1 {
+  margin: 9px 0 12px;
+  font-size: clamp(36px, 5vw, 64px);
+  letter-spacing: -0.05em;
+}
+.data-hero p {
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.access-badge {
+  flex: 0 0 auto;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: 400 9px var(--mono);
+  text-transform: uppercase;
+}
+.access-badge.write { color: var(--lime); border-color: rgba(199, 243, 107, 0.35); }
+.data-policy {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 0.7fr;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  background: rgba(12, 24, 21, 0.45);
+}
+.data-policy div { padding: 14px 16px; border-right: 1px solid var(--line); }
+.data-policy div:last-child { border-right: 0; }
+.data-policy span { display: block; margin-bottom: 6px; color: #607069; font: 400 8px var(--mono); text-transform: uppercase; }
+.data-policy code { color: #b7c7c1; font: 300 8px var(--mono); }
+.data-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.data-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+}
+.data-tabs button.active { color: var(--text); border-color: var(--lime); }
+.data-tabs small { color: var(--lime); font: 400 8px var(--mono); }
+.data-workspace { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.data-workspace.with-editor { grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.55fr); }
+.data-table-panel { min-width: 0; }
+.data-table-panel .structured-table-wrap { padding: 0 22px 24px; }
+.data-table td { vertical-align: middle; }
+.row-actions { white-space: nowrap; }
+.row-actions button {
+  margin-right: 5px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: 300 8px var(--mono);
+}
+.row-actions button.active { color: var(--lime); }
+.row-actions button.confirm { color: #ff9b93; border-color: rgba(255, 121, 111, 0.35); }
+.data-editor form { display: grid; gap: 12px; padding: 0 24px 24px; }
+.data-editor form > label,
+.editor-columns label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font: 400 8px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.data-editor input,
+.data-editor select { width: 100%; }
+.editor-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.data-editor .checkbox-label { display: flex; align-items: center; text-transform: none; }
+.data-editor .checkbox-label input { width: auto; }
+.editor-actions { display: grid; gap: 8px; }
+.editor-actions .run-button { width: 100%; margin: 5px 0 0; }
+.editor-actions > button:last-child:not(:first-child) { padding: 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); }
+.data-editor .admin-message,
+.data-editor .query-error { margin: 0 24px 20px; }
+.data-state { padding: 40px; border: 1px solid var(--line); color: var(--muted); font: 300 10px var(--mono); }
 .agent-registry h2 {
   margin: 6px 0 20px;
 }
@@ -1197,6 +1326,9 @@ pre {
     align-items: start;
     flex-direction: column;
   }
+  .data-workspace.with-editor { grid-template-columns: 1fr; }
+  .data-policy { grid-template-columns: 1fr; }
+  .data-policy div { border-right: 0; border-bottom: 1px solid var(--line); }
   .delegation-flow {
     flex-wrap: wrap;
   }
@@ -1237,12 +1369,15 @@ pre {
     grid-template-columns: 1fr;
   }
   .finance-fields,
+  .scenario-selector > div,
   .report-metrics,
   .agent-card-grid,
   .a2a-explanation ol,
   .a2a-proof dl {
     grid-template-columns: 1fr;
   }
+  .data-hero { align-items: start; flex-direction: column; }
+  .data-tabs { overflow-x: auto; }
   .calculation-proof > div {
     grid-template-columns: 1fr;
   }

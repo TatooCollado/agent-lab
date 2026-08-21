@@ -216,6 +216,8 @@ describe("App", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(/el LLM coordina/i)).toBeInTheDocument();
+    expect(screen.getByText(/no provienen de Neon/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Base 35% reemplazo/i }));
     const runButton = screen.getByRole("button", {
       name: /generar informe con datos reales/i,
     });
@@ -223,12 +225,8 @@ describe("App", () => {
     fireEvent.change(screen.getByLabelText("Costo diario por empleado"), {
       target: { value: "100000" },
     });
-    fireEvent.change(screen.getByLabelText("Recargo por reemplazo %"), {
-      target: { value: "35" },
-    });
-    fireEvent.change(screen.getByLabelText("Impacto de productividad %"), {
-      target: { value: "20" },
-    });
+    expect(screen.getByLabelText("Recargo por reemplazo %")).toHaveValue(35);
+    expect(screen.getByLabelText("Impacto de productividad %")).toHaveValue(20);
     fireEvent.click(runButton);
 
     expect(
@@ -368,6 +366,46 @@ describe("App", () => {
     expect(
       screen.getByText("Estabilidad entre ejecuciones"),
     ).toBeInTheDocument();
-    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(37);
+    expect(screen.getByText("API CRUD tipada")).toBeInTheDocument();
+    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(41);
+  });
+
+  it("shows curated data to a viewer without mutation controls", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string) => Promise.resolve({
+      ok: true,
+      status: 200,
+      json: async () => input === "/api/auth/me"
+        ? { user: { id: "u1", username: "viewer", role: "viewer" } }
+        : { departments: [{ id: "d1", code: "IT", name: "Tecnología", createdAt: "2026-08-20T12:00:00.000Z" }], employees: [], attendanceRecords: [], policy: { exposedResources: [], hiddenResources: [], freeFormSql: false, attendanceLimit: 200 } },
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Datos" }));
+    expect(await screen.findByRole("heading", { name: "Explorador de datos operativos" })).toBeInTheDocument();
+    expect(screen.getByText("Tecnología")).toBeInTheDocument();
+    expect(screen.getByText("Sólo lectura")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Crear registro" })).not.toBeInTheDocument();
+  });
+
+  it("gives an admin an audited CRUD editor", async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => Promise.resolve({
+      ok: true,
+      status: init?.method === "POST" ? 201 : 200,
+      json: async () => input === "/api/auth/me"
+        ? { user: { id: "u1", username: "admin", role: "admin" } }
+        : input === "/api/data-explorer/snapshot"
+          ? { departments: [], employees: [], attendanceRecords: [], policy: { exposedResources: [], hiddenResources: [], freeFormSql: false, attendanceLimit: 200 } }
+          : { department: { id: "d1" } },
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Datos" }));
+    fireEvent.change(await screen.findByLabelText("Código"), { target: { value: "OPS" } });
+    fireEvent.change(screen.getByLabelText("Nombre"), { target: { value: "Operaciones" } });
+    fireEvent.click(screen.getByRole("button", { name: "Crear registro" }));
+    expect(await screen.findByText("Registro creado y auditado.")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith("/api/data-explorer/departments", expect.objectContaining({ method: "POST" }));
   });
 });

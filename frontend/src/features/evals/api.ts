@@ -4,6 +4,7 @@ export type EvalCase = {
   technique: string;
   prompt: string;
   invariants: string[];
+  execution?: string;
 };
 
 export type EvalCatalogResponse = {
@@ -13,7 +14,9 @@ export type EvalCatalogResponse = {
 };
 
 export async function getEvalCatalog(): Promise<EvalCatalogResponse> {
-  const response = await fetch("/api/evals/catalog", { credentials: "include" });
+  const response = await fetch("/api/evals/catalog", {
+    credentials: "include",
+  });
   if (!response.ok) throw new Error("eval_catalog_unavailable");
   return (await response.json()) as EvalCatalogResponse;
 }

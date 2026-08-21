@@ -14,6 +14,7 @@ import { TraceInspector } from "./features/execution-trace/TraceInspector";
 import { EvalCatalog } from "./features/evals/EvalCatalog";
 import { AgentRegistry } from "./features/finance/AgentRegistry";
 import { FinanceLab } from "./features/finance/FinanceLab";
+import { ResiliencePanel } from "./features/resilience/ResiliencePanel";
 
 const concepts = [
   ["01", "Source of Truth", "PostgreSQL · Neon"],
@@ -48,6 +49,14 @@ const concepts = [
   ],
   ["27", "Set Complement", "PostgreSQL NOT EXISTS · explicit negation"],
   ["28", "Controlled Retry", "Groq finalization anomaly · one bounded retry"],
+  ["29", "Timeout Budget", "AbortSignal · maximum provider attempt duration"],
+  ["30", "Circuit Breaker", "Closed → open → half-open state machine"],
+  [
+    "31",
+    "Graceful Degradation",
+    "Grounded answerPayload survives narration failure",
+  ],
+  ["32", "Fault Injection", "Controlled failure · resilience evaluation"],
 ];
 
 function errorMessage(error: unknown): string {
@@ -55,6 +64,14 @@ function errorMessage(error: unknown): string {
   if (code === "agent_not_configured") {
     return "The configured LLM provider is unavailable.";
   }
+  if (code === "llm_timeout")
+    return "The LLM provider exceeded its timeout budget.";
+  if (code === "llm_rate_limited")
+    return "The LLM provider is rate limited. Try again shortly.";
+  if (code === "llm_circuit_open")
+    return "The LLM circuit is open. Try again after the cooldown.";
+  if (code === "llm_provider_unavailable")
+    return "The LLM provider is temporarily unavailable.";
   if (code === "invalid_agent_query") return "The question is invalid.";
   if (code === "unsupported_agent_query") {
     return "Query outside the supported capability matrix. Check System index for examples.";
@@ -173,7 +190,7 @@ export function App() {
           <code>{user.role}</code>
           <button onClick={() => void signOut()}>Sign out</button>
         </div>
-        <div className="stage-badge">Stage 09 · Deterministic contracts</div>
+        <div className="stage-badge">Stage 10 · Resilient execution</div>
       </header>
 
       <main id="top">
@@ -297,6 +314,7 @@ export function App() {
               ))}
             </div>
             <CapabilityMatrix />
+            <ResiliencePanel />
             <AgentRegistry />
           </section>
         ) : (

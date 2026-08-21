@@ -23,6 +23,7 @@ import type { FinanceCoordinator } from "./a2a/finance-client.js";
 import { financeReportInputSchema } from "./finance/contracts.js";
 import { EVAL_CATALOG } from "./evals/catalog.js";
 import { agentRateLimit, loginRateLimit } from "./security/rate-limits.js";
+import { ProviderResilienceError } from "./resilience/provider-resilience.js";
 
 const SESSION_COOKIE = "agent_lab_session";
 const createHelmet =
@@ -50,6 +51,9 @@ export function createApp(
   const env = loadEnv();
   const app = express();
   const auth = options.auth ?? new DatabaseAuthService(env.SESSION_TTL_HOURS);
+  let defaultAgent: AgentRunner | null = null;
+  const getAgent = () =>
+    options.agent ?? (defaultAgent ??= createDefaultAgent());
   const cookieOptions = {
     httpOnly: true,
     sameSite: "strict" as const,
@@ -83,7 +87,7 @@ export function createApp(
 
   app.get("/api/system", (_req, res) => {
     res.json({
-      stage: 9,
+      stage: 10,
       timezone: env.APP_TIMEZONE,
       components: [
         "React",
@@ -123,6 +127,10 @@ export function createApp(
         "Typed answer presentation payloads",
         "SQL set complement with NOT EXISTS",
         "Bounded LLM finalization retry",
+        "LLM timeout budget",
+        "Circuit breaker",
+        "Graceful structured-response degradation",
+        "Controlled fault injection",
       ],
       pending: [],
     });
@@ -136,6 +144,28 @@ export function createApp(
         tool,
         examples,
       })),
+    });
+  });
+
+  app.get("/api/resilience", (_req, res) => {
+    res.json({
+      provider: env.LLM_PROVIDER,
+      policy: {
+        timeoutMs: env.LLM_TIMEOUT_MS,
+        transientRetries: env.LLM_TRANSIENT_RETRIES,
+        circuitFailureThreshold: env.LLM_CIRCUIT_FAILURE_THRESHOLD,
+        circuitResetMs: env.LLM_CIRCUIT_RESET_MS,
+        finalizationFallback: "typed_answer_payload",
+      },
+      runtime: getAgent().resilienceSnapshot?.() ?? { state: "not_exposed" },
+      semantics: {
+        timeout: "maximum duration per provider attempt",
+        retry: "bounded retry for transient provider failures",
+        circuitBreaker:
+          "rejects provider calls while an unhealthy circuit is open",
+        gracefulDegradation:
+          "preserves grounded presentation when only final narration fails",
+      },
     });
   });
 
@@ -327,7 +357,7 @@ export function createApp(
       }
 
       try {
-        const agent = options.agent ?? createDefaultAgent();
+        const agent = getAgent();
         const result = await agent.run(
           parsed.data.question,
           res.locals.requestId as string,
@@ -339,6 +369,14 @@ export function createApp(
             error: error.code,
             requestId: res.locals.requestId,
             supportedCapabilities: error.supportedCapabilities,
+          });
+          return;
+        }
+        if (error instanceof ProviderResilienceError) {
+          res.status(error.httpStatus).json({
+            error: error.code,
+            requestId: res.locals.requestId,
+            retryable: error.retryable,
           });
           return;
         }

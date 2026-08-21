@@ -21,7 +21,7 @@ assert.equal(directHealth.status, "ok");
 assert.equal(directHealth.service, "agent-lab-backend");
 
 const system = await (await request("/api/system")).json();
-assert.equal(system.stage, 9);
+assert.equal(system.stage, 10);
 assert.deepEqual(system.pending, []);
 assert.ok(system.components.includes("GitHub Actions"));
 assert.ok(system.components.includes("Deployment smoke tests"));
@@ -29,9 +29,20 @@ assert.ok(system.components.includes("Deterministic capability routing"));
 assert.ok(system.components.includes("Typed answer presentation payloads"));
 assert.ok(system.components.includes("SQL set complement with NOT EXISTS"));
 assert.ok(system.components.includes("Bounded LLM finalization retry"));
+assert.ok(system.components.includes("LLM timeout budget"));
+assert.ok(system.components.includes("Circuit breaker"));
+assert.ok(
+  system.components.includes("Graceful structured-response degradation"),
+);
 
 const capabilities = await (await request("/api/agent/capabilities")).json();
 assert.equal(capabilities.capabilities.length, 7);
+
+const resilience = await (await request("/api/resilience")).json();
+assert.equal(resilience.policy.timeoutMs, 12_000);
+assert.equal(resilience.policy.transientRetries, 1);
+assert.equal(resilience.policy.circuitFailureThreshold, 3);
+assert.equal(resilience.policy.finalizationFallback, "typed_answer_payload");
 
 const proxiedHealth = await (await request("/api/health", FRONTEND_URL)).json();
 assert.equal(proxiedHealth.status, "ok");
@@ -47,6 +58,7 @@ console.log(
       "vercel-health",
       "system-contract",
       "capability-catalog",
+      "resilience-contract",
       "render-proxy",
       "frontend-html",
     ],

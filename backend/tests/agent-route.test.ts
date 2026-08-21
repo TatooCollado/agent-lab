@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createApp } from "../src/app.js";
 import type { AgentRunner } from "../src/agent/orchestrator.js";
 import { UnsupportedAgentQueryError } from "../src/agent/capability-router.js";
+import { ProviderResilienceError } from "../src/resilience/provider-resilience.js";
 import type { AuthService } from "../src/auth/service.js";
 
 const requestId = "22222222-2222-4222-8222-222222222222";
@@ -122,6 +123,54 @@ describe("POST /api/agent/query", () => {
         "employee_directory",
       ]),
     });
+  });
+
+  it("maps provider resilience failures to a typed public error", async () => {
+    const agent: AgentRunner = {
+      run: vi
+        .fn()
+        .mockRejectedValue(
+          new ProviderResilienceError("llm_timeout", 504, true),
+        ),
+    };
+
+    const response = await request(createApp({ agent, auth }))
+      .post("/api/agent/query")
+      .set("cookie", "agent_lab_session=test-token")
+      .send({ question: "¿Quién llegó tarde el último mes?" });
+
+    expect(response.status).toBe(504);
+    expect(response.body).toMatchObject({
+      error: "llm_timeout",
+      retryable: true,
+    });
+  });
+
+  it("exposes the configured resilience contract without secrets", async () => {
+    const agent: AgentRunner = {
+      run: vi.fn(),
+      resilienceSnapshot: () => ({
+        circuit: { state: "closed", failures: 0 },
+      }),
+    };
+
+    const response = await request(createApp({ agent, auth })).get(
+      "/api/resilience",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      policy: {
+        timeoutMs: 12000,
+        transientRetries: 1,
+        circuitFailureThreshold: 3,
+        finalizationFallback: "typed_answer_payload",
+      },
+      runtime: { circuit: { state: "closed", failures: 0 } },
+    });
+    expect(JSON.stringify(response.body)).not.toMatch(
+      /api.?key|token|password/i,
+    );
   });
 
   it("requires an authenticated session", async () => {

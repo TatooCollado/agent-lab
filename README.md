@@ -7,7 +7,7 @@ Aplicación educativa para inspeccionar el flujo técnico de agentes de IA sobre
 
 ## Estado
 
-Etapas 1 a 9 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, cloud, CI/CD y contratos deterministas:
+Etapas 1 a 10 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, cloud, CI/CD, contratos deterministas y resiliencia:
 
 - frontend React + Vite;
 - backend Node.js + Express;
@@ -17,7 +17,7 @@ Etapas 1 a 9 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, c
 - contrato técnico `TraceEvent`;
 - tests unitarios y shell visual del Agent Lab;
 - servidor MCP oficial sobre transporte `stdio`;
-- tres herramientas MCP de solo lectura con respuestas estructuradas;
+- siete herramientas MCP de solo lectura con respuestas estructuradas;
 - consultas PostgreSQL parametrizadas mediante un rol de mínimo privilegio.
 - Ollama con `qwen3:8b` para inferencia local y tool calling sin costo por token;
 - OpenAI Responses API conservada como proveedor opcional;
@@ -35,6 +35,9 @@ Etapas 1 a 9 — Fundación, MCP, Agent Runtime, Auth/RBAC, A2A, evaluaciones, c
 - suite de evaluaciones de comportamiento con assertions deterministas;
 - casos de referencia, resultado vacío y frescura de PostgreSQL;
 - fixture dinámica aislada con limpieza garantizada y verificación residual.
+- timeout presupuestado, retry transitorio acotado y circuit breaker por instancia caliente;
+- degradación segura que conserva el `answerPayload` grounded si falla sólo la narrativa;
+- evaluación de resiliencia con inyección controlada de fallos.
 
 La aplicación está desplegada con frontend estático en Render, backend serverless en Vercel y PostgreSQL en Neon. GitHub Actions aplica quality gates y smoke tests contra producción.
 
@@ -247,6 +250,21 @@ Las cantidades, tablas, fechas, estados vacíos y metadatos de fuente se muestra
 
 La consulta negada se implementa como diferencia de conjuntos: empleados activos menos empleados con al menos una llegada tarde dentro del período. PostgreSQL ejecuta esa semántica mediante `NOT EXISTS`; el LLM no calcula el complemento. Si Groq devuelve una respuesta final vacía o intenta una segunda tool call durante la finalización, el adaptador realiza un único reintento textual con los mismos datos grounded. El evento `llm.grounded_response.completed` informa `recovery=not_required`, el tipo de retry aplicado o el fallback a la presentación determinista.
 
+## Resiliencia del proveedor LLM
+
+La Etapa 10 contiene fallos externos mediante cuatro mecanismos explícitos:
+
+| Técnica              | Política de demostración                              | Resultado                                                               |
+| -------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------- |
+| timeout budget       | 12 segundos por intento                               | aborta una llamada que excede el presupuesto                            |
+| bounded retry        | 1 retry transitorio                                   | reintenta `429`, timeout, red o `5xx`; no reintenta errores funcionales |
+| circuit breaker      | abre con 3 fallos; prueba half-open a los 30 segundos | evita insistir contra un proveedor que permanece caído                  |
+| graceful degradation | sólo después de una consulta MCP correcta             | conserva `presentation` grounded aunque no exista narrativa LLM         |
+
+El endpoint público `GET /api/resilience` expone la política y el estado sanitizado del circuito, nunca credenciales. El agente se reutiliza dentro de cada instancia caliente para que el circuit breaker conserve estado entre requests. En Vercel cada instancia posee su propio circuito; coordinarlo globalmente exigiría un store distribuido y no se justifica para este laboratorio.
+
+Si falla la planificación inicial, todavía no existe una llamada MCP ni datos grounded y la API devuelve un error tipado (`llm_timeout`, `llm_rate_limited`, `llm_provider_unavailable` o `llm_circuit_open`). Si falla únicamente la redacción final, la API responde exitosamente con la tabla determinista y emite `llm.grounded_response.degraded`.
+
 ## Autenticación y autorización
 
 Las credenciales se validan contra hashes bcrypt en `app_users`. Al autenticar, el backend crea un token aleatorio, guarda únicamente su hash SHA-256 en `app_sessions` y entrega el token mediante una cookie `HttpOnly`. El frontend nunca accede al token.
@@ -327,6 +345,7 @@ Casos implementados:
 - `known-late-arrivals`: compara herramienta, grounding y cantidad contra el dataset sembrado;
 - `unknown-employee`: exige resultado PostgreSQL vacío y una respuesta explícita sin datos inventados;
 - `source-of-truth-freshness`: inserta un empleado temporal único y una llegada tarde, consulta el registro recién creado y comprueba que el agente observa la actualización.
+- `finalization-failure-degradation`: inyecta un fallo controlado después de MCP y comprueba que el payload PostgreSQL continúa disponible.
 
 La fixture dinámica usa el rol administrativo sólo durante la preparación y limpieza. La consulta del agente continúa usando el rol read-only. Un bloque `finally` elimina por UUID y número de empleado exactos; al finalizar, una consulta adicional exige que no existan empleados `EVAL-%` ni asistencias con fuente `agent-evaluation`.
 
@@ -334,6 +353,7 @@ Ejecución real con el proveedor LLM configurado, MCP y Neon:
 
 ```bash
 npm run evals:run
+npm run resilience:eval
 ```
 
 El comando devuelve un JSON reproducible con `passRate`, duración, checks esperados/reales y evidencia grounded por caso. Finaliza con código distinto de cero si falla una evaluación o si queda alguna fixture temporal. El caso de referencia presupone que el seed de demostración está presente.
@@ -374,6 +394,10 @@ MCP_TRANSPORT=in_process
 LLM_PROVIDER=groq
 GROQ_MODEL=openai/gpt-oss-20b
 GROQ_API_KEY=<secret>
+LLM_TIMEOUT_MS=12000
+LLM_TRANSIENT_RETRIES=1
+LLM_CIRCUIT_FAILURE_THRESHOLD=3
+LLM_CIRCUIT_RESET_MS=30000
 DATABASE_READONLY_URL=<secret>
 DATABASE_ADMIN_URL=<secret>
 A2A_INTERNAL_TOKEN=<secret-aleatorio-de-32-o-mas-caracteres>
@@ -400,6 +424,7 @@ Vercel está conectado al repositorio con `backend/` como Root Directory; un com
 
 - health directo del backend Vercel;
 - contrato de `/api/system` y etapa vigente;
+- contrato público de `/api/resilience`;
 - proxy `/api/*` servido bajo el origen Render;
 - disponibilidad del documento HTML del frontend.
 

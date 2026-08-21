@@ -12,9 +12,11 @@ import { createAnswerPresentation } from "./answer-presentation.js";
 import { routeAgentCapability } from "./capability-router.js";
 import { HR_AGENT_SYSTEM_PROMPT } from "./system-prompt.js";
 import { CONTROLLED_TOOL_CATALOG, controlledTools } from "./tool-catalog.js";
+import { ProviderResilienceError } from "../resilience/provider-resilience.js";
 
 export interface AgentRunner {
   run(question: string, requestId: string): Promise<AgentAnswer>;
+  resilienceSnapshot?(): unknown;
 }
 
 function elapsed(startedAt: number): number {
@@ -54,6 +56,10 @@ export class HrAgentOrchestrator implements AgentRunner {
     private readonly llm: AgentLlm,
     private readonly gatewayFactory: () => McpGateway,
   ) {}
+
+  resilienceSnapshot() {
+    return this.llm.resilienceSnapshot?.() ?? { state: "not_exposed" };
+  }
 
   async run(question: string, requestId: string): Promise<AgentAnswer> {
     const trace: TraceEvent[] = [];
@@ -200,25 +206,43 @@ export class HrAgentOrchestrator implements AgentRunner {
         }),
       );
 
+      const presentation = createAnswerPresentation(toolOutputs[0]!);
       startedAt = performance.now();
-      const final = await this.llm.respond({
-        question,
-        instructions: HR_AGENT_SYSTEM_PROMPT,
-        tools,
-        plan,
-        toolOutputs,
-      });
+      let final;
+      try {
+        final = await this.llm.respond({
+          question,
+          instructions: HR_AGENT_SYSTEM_PROMPT,
+          tools,
+          plan,
+          toolOutputs,
+        });
+      } catch (error) {
+        if (!(error instanceof ProviderResilienceError)) throw error;
+        final = {
+          answer:
+            "Los datos se consultaron correctamente. La narrativa del modelo no está disponible; revisá la respuesta estructurada.",
+          model: plan.model,
+          recovery: `safe_degradation:${error.code}`,
+        };
+      }
+      const degraded =
+        final.recovery?.includes("fallback") ||
+        final.recovery?.startsWith("safe_degradation:");
       trace.push(
         event(requestId, {
-          category: "llm",
-          name: "llm.grounded_response.completed",
+          category: degraded ? "guardrail" : "llm",
+          name: degraded
+            ? "llm.grounded_response.degraded"
+            : "llm.grounded_response.completed",
           status: "completed",
-          technology: "LLM Chat API",
+          technology: degraded ? "Deterministic fallback" : "LLM Chat API",
           component: final.model,
           concepts: [
             "Grounded generation",
             "Function call output",
             "Bounded retry",
+            ...(degraded ? ["Graceful degradation"] : []),
           ],
           input: { toolOutputs: toolOutputs.length },
           output: {
@@ -229,7 +253,6 @@ export class HrAgentOrchestrator implements AgentRunner {
         }),
       );
 
-      const presentation = createAnswerPresentation(toolOutputs[0]!);
       trace.push(
         event(requestId, {
           category: "guardrail",

@@ -289,6 +289,32 @@ describe("App", () => {
                 ],
               };
             }
+            if (input === "/api/resilience") {
+              return {
+                provider: "groq",
+                policy: {
+                  timeoutMs: 12000,
+                  transientRetries: 1,
+                  circuitFailureThreshold: 3,
+                  circuitResetMs: 30000,
+                  finalizationFallback: "typed_answer_payload",
+                },
+                runtime: {
+                  circuit: {
+                    state: "closed",
+                    failures: 0,
+                    failureThreshold: 3,
+                    resetMs: 30000,
+                  },
+                },
+                semantics: {
+                  timeout: "maximum duration per provider attempt",
+                  retry: "bounded retry for transient provider failures",
+                  circuitBreaker: "rejects calls while open",
+                  gracefulDegradation: "preserves grounded presentation",
+                },
+              };
+            }
             return { cards: [] };
           },
         }),
@@ -310,7 +336,12 @@ describe("App", () => {
     expect(screen.getByText("Deterministic Presentation")).toBeInTheDocument();
     expect(screen.getByText("Set Complement")).toBeInTheDocument();
     expect(screen.getByText("Controlled Retry")).toBeInTheDocument();
+    expect(screen.getByText("Circuit Breaker")).toBeInTheDocument();
+    expect(screen.getByText("Graceful Degradation")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Resilience policy" }),
+    ).toBeInTheDocument();
     expect(await screen.findByText("list_employees")).toBeInTheDocument();
-    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(28);
+    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(32);
   });
 });

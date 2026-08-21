@@ -25,7 +25,8 @@
     "agent:smoke:groq": "tsx src/agent/smoke-groq.ts",
     "auth:smoke": "tsx src/auth/smoke.ts",
     "a2a:smoke": "tsx src/a2a/smoke.ts",
-    "evals:run": "tsx src/evals/cli.ts"
+    "evals:run": "tsx src/evals/cli.ts",
+    "resilience:eval": "tsx src/evals/resilience-cli.ts"
   },
   "dependencies": {
     "@a2a-js/sdk": "^1.0.1",

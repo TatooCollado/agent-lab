@@ -9,6 +9,11 @@ import type {
   AgentToolCall,
   AgentToolDefinition,
 } from "./contracts.js";
+import {
+  DEFAULT_RESILIENCE_POLICY,
+  ResilientProviderExecutor,
+  type ResiliencePolicy,
+} from "../resilience/provider-resilience.js";
 
 type GroqContinuation = { messages: ChatCompletionMessageParam[] };
 
@@ -60,18 +65,26 @@ function asGroqTools(tools: AgentToolDefinition[]): ChatCompletionTool[] {
 
 export class GroqChatLlm implements AgentLlm {
   private readonly client: OpenAI;
+  private readonly resilience: ResilientProviderExecutor;
 
   constructor(
     apiKey: string,
     private readonly model: string,
     client?: OpenAI,
+    resiliencePolicy: ResiliencePolicy = DEFAULT_RESILIENCE_POLICY,
   ) {
     this.client =
       client ??
       new OpenAI({
         apiKey,
         baseURL: "https://api.groq.com/openai/v1",
+        maxRetries: 0,
       });
+    this.resilience = new ResilientProviderExecutor(resiliencePolicy);
+  }
+
+  resilienceSnapshot() {
+    return this.resilience.snapshot();
   }
 
   async plan(input: {
@@ -84,14 +97,19 @@ export class GroqChatLlm implements AgentLlm {
       { role: "user", content: input.question },
     ];
     const request = () =>
-      this.client.chat.completions.create({
-        model: this.model,
-        messages,
-        tools: asGroqTools(input.tools),
-        tool_choice: "required",
-        parallel_tool_calls: false,
-        temperature: 0,
-      });
+      this.resilience.execute((signal) =>
+        this.client.chat.completions.create(
+          {
+            model: this.model,
+            messages,
+            tools: asGroqTools(input.tools),
+            tool_choice: "required",
+            parallel_tool_calls: false,
+            temperature: 0,
+          },
+          { signal },
+        ),
+      );
     let response;
     try {
       response = await request();
@@ -166,11 +184,16 @@ export class GroqChatLlm implements AgentLlm {
       },
     ];
     const request = (messages: ChatCompletionMessageParam[]) =>
-      this.client.chat.completions.create({
-        model: this.model,
-        messages,
-        temperature: 0,
-      });
+      this.resilience.execute((signal) =>
+        this.client.chat.completions.create(
+          {
+            model: this.model,
+            messages,
+            temperature: 0,
+          },
+          { signal },
+        ),
+      );
 
     let response;
     let recovery: string | undefined;

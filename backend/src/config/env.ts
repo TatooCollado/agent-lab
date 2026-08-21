@@ -4,15 +4,17 @@ import { z } from "zod";
 const optionalUrl = z.string().url().optional();
 const optionalSecret = z.preprocess(
   (value) => (value === "" ? undefined : value),
-  z.string().min(1).optional()
+  z.string().min(1).optional(),
 );
 const optionalInternalToken = z.preprocess(
   (value) => (value === "" ? undefined : value),
-  z.string().min(32).optional()
+  z.string().min(32).optional(),
 );
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   FRONTEND_ORIGIN: z.string().url().default("http://localhost:5173"),
   APP_TIMEZONE: z.string().default("America/Argentina/Buenos_Aires"),
@@ -30,8 +32,27 @@ const envSchema = z.object({
   OPENAI_MODEL: z.string().min(1).default("gpt-5.6"),
   GROQ_API_KEY: optionalSecret,
   GROQ_MODEL: z.string().min(1).default("openai/gpt-oss-20b"),
+  LLM_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .min(1_000)
+    .max(60_000)
+    .default(12_000),
+  LLM_TRANSIENT_RETRIES: z.coerce.number().int().min(0).max(3).default(1),
+  LLM_CIRCUIT_FAILURE_THRESHOLD: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(10)
+    .default(3),
+  LLM_CIRCUIT_RESET_MS: z.coerce
+    .number()
+    .int()
+    .min(1_000)
+    .max(300_000)
+    .default(30_000),
   SEED_ADMIN_PASSWORD: z.string().min(12).optional(),
-  SEED_VIEWER_PASSWORD: z.string().min(12).optional()
+  SEED_VIEWER_PASSWORD: z.string().min(12).optional(),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;

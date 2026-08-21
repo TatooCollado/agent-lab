@@ -83,6 +83,7 @@ export type AgentPlan = {
 };
 
 export interface AgentLlm {
+  resilienceSnapshot?(): unknown;
   plan(input: {
     question: string;
     instructions: string;

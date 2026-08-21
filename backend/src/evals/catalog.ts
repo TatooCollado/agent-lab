@@ -72,4 +72,18 @@ export const EVAL_CATALOG = [
       "fixture always cleaned",
     ],
   },
+  {
+    id: "finalization-failure-degradation",
+    title: "Grounded payload survives LLM finalization failure",
+    technique: "Controlled fault injection",
+    prompt: "¿Qué empleados llegaron tarde durante el último mes?",
+    execution: "npm run resilience:eval",
+    invariants: [
+      "LLM finalization failure injected",
+      "fresh MCP query",
+      "grounded=true",
+      "typed presentation preserved",
+      "degradation trace emitted",
+    ],
+  },
 ] as const;

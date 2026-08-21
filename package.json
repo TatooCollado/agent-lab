@@ -13,6 +13,7 @@
     "auth:smoke": "npm --prefix backend run auth:smoke",
     "a2a:smoke": "npm --prefix backend run a2a:smoke",
     "evals:run": "npm --prefix backend run evals:run",
+    "resilience:eval": "npm --prefix backend run resilience:eval",
     "test": "npm --prefix backend test && npm --prefix frontend test",
     "typecheck": "npm --prefix backend run typecheck && npm --prefix frontend run typecheck",
     "build": "npm --prefix backend run build && npm --prefix frontend run build"

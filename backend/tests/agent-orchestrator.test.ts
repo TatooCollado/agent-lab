@@ -7,6 +7,7 @@ import type {
 } from "../src/agent/contracts.js";
 import type { McpGateway } from "../src/agent/mcp-gateway.js";
 import { HrAgentOrchestrator } from "../src/agent/orchestrator.js";
+import { ProviderResilienceError } from "../src/resilience/provider-resilience.js";
 
 const requestId = "11111111-1111-4111-8111-111111111111";
 
@@ -193,6 +194,33 @@ describe("HrAgentOrchestrator", () => {
     ).rejects.toThrow(/unapproved tool/i);
     expect(gateway.calls).toHaveLength(0);
     expect(gateway.closed).toBe(true);
+  });
+
+  it("preserves the typed payload when final LLM narration is unavailable", async () => {
+    const gateway = new FakeGateway();
+    const llm = new FakeLlm();
+    llm.respond = vi
+      .fn()
+      .mockRejectedValue(
+        new ProviderResilienceError("llm_provider_unavailable", 503, true),
+      );
+    const agent = new HrAgentOrchestrator(llm, () => gateway);
+
+    const result = await agent.run("Buscá al empleado Inexistente", requestId);
+
+    expect(result.grounded).toBe(true);
+    expect(result.presentation.kind).toBe("employee_search");
+    expect(result.answer).toMatch(/narrativa del modelo no está disponible/i);
+    expect(result.trace.map((item) => item.name)).toContain(
+      "llm.grounded_response.degraded",
+    );
+    expect(
+      result.trace.find(
+        (item) => item.name === "llm.grounded_response.degraded",
+      )?.output,
+    ).toMatchObject({
+      recovery: "safe_degradation:llm_provider_unavailable",
+    });
   });
 
   it("routes an explicit negation to the SQL set-complement tool", async () => {

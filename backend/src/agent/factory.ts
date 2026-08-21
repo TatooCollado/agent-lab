@@ -10,7 +10,7 @@ export function createDefaultAgent(): HrAgentOrchestrator {
   if (env.LLM_PROVIDER === "ollama") {
     return new HrAgentOrchestrator(
       new OllamaChatLlm(env.OLLAMA_HOST, env.OLLAMA_MODEL),
-      () => createConfiguredMcpGateway()
+      () => createConfiguredMcpGateway(),
     );
   }
   if (env.LLM_PROVIDER === "groq") {
@@ -18,8 +18,14 @@ export function createDefaultAgent(): HrAgentOrchestrator {
       throw new Error("GROQ_API_KEY is not configured");
     }
     return new HrAgentOrchestrator(
-      new GroqChatLlm(env.GROQ_API_KEY, env.GROQ_MODEL),
-      () => createConfiguredMcpGateway()
+      new GroqChatLlm(env.GROQ_API_KEY, env.GROQ_MODEL, undefined, {
+        timeoutMs: env.LLM_TIMEOUT_MS,
+        transientRetries: env.LLM_TRANSIENT_RETRIES,
+        retryDelayMs: 150,
+        circuitFailureThreshold: env.LLM_CIRCUIT_FAILURE_THRESHOLD,
+        circuitResetMs: env.LLM_CIRCUIT_RESET_MS,
+      }),
+      () => createConfiguredMcpGateway(),
     );
   }
   if (!env.OPENAI_API_KEY) {
@@ -27,6 +33,6 @@ export function createDefaultAgent(): HrAgentOrchestrator {
   }
   return new HrAgentOrchestrator(
     new OpenAIResponsesLlm(env.OPENAI_API_KEY, env.OPENAI_MODEL),
-    () => createConfiguredMcpGateway()
+    () => createConfiguredMcpGateway(),
   );
 }

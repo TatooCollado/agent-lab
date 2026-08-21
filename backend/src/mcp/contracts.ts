@@ -1,0 +1,80 @@
+import { z } from "zod";
+import { periodNameSchema } from "../shared/time/period.js";
+
+export const findEmployeeInputSchema = z.object({
+  query: z.string().trim().min(1).max(100).describe("Nombre o número de empleado")
+});
+
+export const periodInputSchema = z.object({
+  period: periodNameSchema.describe("Período calendario predefinido"),
+  employeeNumber: z.string().trim().min(1).max(50).optional()
+});
+
+const resultMetadataSchema = z.object({
+  source: z.literal("postgresql"),
+  queriedAt: z.string(),
+  count: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+  truncated: z.boolean()
+});
+
+export const employeeRecordSchema = z.object({
+  employeeId: z.string().uuid(),
+  employeeNumber: z.string(),
+  fullName: z.string(),
+  departmentCode: z.string(),
+  departmentName: z.string(),
+  timezone: z.string(),
+  active: z.boolean()
+});
+
+export const lateArrivalRecordSchema = z.object({
+  employeeId: z.string().uuid(),
+  employeeNumber: z.string(),
+  fullName: z.string(),
+  departmentCode: z.string(),
+  workDate: z.string(),
+  scheduledStart: z.string(),
+  actualArrival: z.string(),
+  lateMinutes: z.number().int().positive()
+});
+
+export const absenceRecordSchema = z.object({
+  employeeId: z.string().uuid(),
+  employeeNumber: z.string(),
+  fullName: z.string(),
+  departmentCode: z.string(),
+  workDate: z.string(),
+  scheduledStart: z.string(),
+  absenceReason: z.string().nullable()
+});
+
+const periodSchema = z.object({
+  name: periodNameSchema,
+  timezone: z.string(),
+  startInclusive: z.string(),
+  endExclusive: z.string()
+});
+
+export const findEmployeeOutputSchema = resultMetadataSchema.extend({
+  query: z.string(),
+  records: z.array(employeeRecordSchema)
+});
+
+export const lateArrivalsOutputSchema = resultMetadataSchema.extend({
+  period: periodSchema,
+  employeeNumber: z.string().nullable(),
+  records: z.array(lateArrivalRecordSchema)
+});
+
+export const absencesOutputSchema = resultMetadataSchema.extend({
+  period: periodSchema,
+  employeeNumber: z.string().nullable(),
+  records: z.array(absenceRecordSchema)
+});
+
+export type FindEmployeeInput = z.infer<typeof findEmployeeInputSchema>;
+export type PeriodInput = z.infer<typeof periodInputSchema>;
+export type FindEmployeeOutput = z.infer<typeof findEmployeeOutputSchema>;
+export type LateArrivalsOutput = z.infer<typeof lateArrivalsOutputSchema>;
+export type AbsencesOutput = z.infer<typeof absencesOutputSchema>;

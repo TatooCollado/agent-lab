@@ -1,0 +1,59 @@
+import { z } from "zod";
+import { traceEventSchema } from "../observability/trace-event.js";
+
+export const agentQuerySchema = z.object({
+  question: z.string().trim().min(3).max(1_000)
+});
+
+export const agentAnswerSchema = z.object({
+  requestId: z.string().uuid(),
+  answer: z.string().min(1),
+  model: z.string().min(1),
+  grounded: z.literal(true),
+  toolsUsed: z.array(z.string().min(1)).min(1),
+  trace: z.array(traceEventSchema)
+});
+
+export type AgentQuery = z.infer<typeof agentQuerySchema>;
+export type AgentAnswer = z.infer<typeof agentAnswerSchema>;
+
+export type AgentToolDefinition = {
+  type: "function";
+  name: string;
+  description: string;
+  parameters: Record<string, unknown>;
+  strict: true;
+};
+
+export type AgentToolCall = {
+  callId: string;
+  name: string;
+  arguments: Record<string, unknown>;
+};
+
+export type AgentToolOutput = {
+  callId: string;
+  name: string;
+  output: Record<string, unknown>;
+};
+
+export type AgentPlan = {
+  model: string;
+  calls: AgentToolCall[];
+  continuation: unknown;
+};
+
+export interface AgentLlm {
+  plan(input: {
+    question: string;
+    instructions: string;
+    tools: AgentToolDefinition[];
+  }): Promise<AgentPlan>;
+  respond(input: {
+    question: string;
+    instructions: string;
+    tools: AgentToolDefinition[];
+    plan: AgentPlan;
+    toolOutputs: AgentToolOutput[];
+  }): Promise<{ answer: string; model: string }>;
+}

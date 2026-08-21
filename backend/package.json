@@ -1,0 +1,58 @@
+{
+  "name": "agent-lab-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:permissions": "tsx src/db/apply-permissions.ts",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:smoke": "tsx src/db/smoke.ts",
+    "db:verify-permissions": "tsx src/db/verify-permissions.ts",
+    "mcp:server": "tsx src/mcp/stdio-entry.ts",
+    "mcp:smoke": "tsx src/mcp/smoke-client.ts",
+    "agent:smoke": "tsx src/agent/smoke.ts",
+    "agent:smoke:ollama": "tsx src/agent/smoke-ollama.ts",
+    "agent:smoke:openai": "tsx src/agent/smoke-openai.ts",
+    "agent:smoke:groq": "tsx src/agent/smoke-groq.ts",
+    "auth:smoke": "tsx src/auth/smoke.ts",
+    "a2a:smoke": "tsx src/a2a/smoke.ts",
+    "evals:run": "tsx src/evals/cli.ts"
+  },
+  "dependencies": {
+    "@a2a-js/sdk": "^1.0.1",
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.6.2",
+    "helmet": "^8.3.0",
+    "luxon": "^3.7.1",
+    "ollama": "^0.6.3",
+    "openai": "^7.5.0",
+    "pg": "^8.16.3",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/luxon": "^3.6.2",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.15.5",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.2.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

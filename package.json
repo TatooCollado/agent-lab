@@ -1,0 +1,20 @@
+{
+  "name": "agent-lab",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "mcp:server": "npm --prefix backend run mcp:server",
+    "mcp:smoke": "npm --prefix backend run mcp:smoke",
+    "agent:smoke": "npm --prefix backend run agent:smoke",
+    "agent:smoke:ollama": "npm --prefix backend run agent:smoke:ollama",
+    "agent:smoke:openai": "npm --prefix backend run agent:smoke:openai",
+    "agent:smoke:groq": "npm --prefix backend run agent:smoke:groq",
+    "auth:smoke": "npm --prefix backend run auth:smoke",
+    "a2a:smoke": "npm --prefix backend run a2a:smoke",
+    "evals:run": "npm --prefix backend run evals:run",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "typecheck": "npm --prefix backend run typecheck && npm --prefix frontend run typecheck",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build"
+  }
+}

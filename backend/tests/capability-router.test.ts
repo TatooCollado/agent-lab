@@ -14,6 +14,11 @@ describe("routeAgentCapability", () => {
     ["Buscá a Ana Torres", "find_employee"],
     ["Pasame las demoras totales de Bruno Silva", "summarize_employee_delays"],
     ["¿Quién llegó tarde el último mes?", "list_late_arrivals"],
+    [
+      "¿Quién no llegó tarde el último mes?",
+      "list_employees_without_late_arrivals",
+    ],
+    ["Empleados sin demoras este mes", "list_employees_without_late_arrivals"],
     ["¿Qué ausencias hubo este mes?", "list_absences"],
   ] as const;
 

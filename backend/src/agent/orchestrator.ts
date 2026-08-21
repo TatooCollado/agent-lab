@@ -215,9 +215,16 @@ export class HrAgentOrchestrator implements AgentRunner {
           status: "completed",
           technology: "LLM Chat API",
           component: final.model,
-          concepts: ["Grounded generation", "Function call output"],
+          concepts: [
+            "Grounded generation",
+            "Function call output",
+            "Bounded retry",
+          ],
           input: { toolOutputs: toolOutputs.length },
-          output: { answerLength: final.answer.length },
+          output: {
+            answerLength: final.answer.length,
+            recovery: final.recovery ?? "not_required",
+          },
           durationMs: elapsed(startedAt),
         }),
       );

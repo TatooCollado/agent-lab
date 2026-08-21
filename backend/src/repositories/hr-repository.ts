@@ -68,6 +68,9 @@ export interface HrRepository {
     period: DatePeriod,
     employeeNumber?: string,
   ): Promise<LimitedResult<LateArrivalRecord>>;
+  listEmployeesWithoutLateArrivals(
+    period: DatePeriod,
+  ): Promise<LimitedResult<EmployeeDirectoryRecord>>;
   listAbsences(
     period: DatePeriod,
     employeeNumber?: string,
@@ -298,6 +301,55 @@ export class PostgresHrRepository implements HrRepository {
       scheduledStart: row.scheduled_start,
       actualArrival: row.actual_arrival,
       lateMinutes: row.late_minutes,
+    }));
+  }
+
+  async listEmployeesWithoutLateArrivals(
+    period: DatePeriod,
+  ): Promise<LimitedResult<EmployeeDirectoryRecord>> {
+    type Row = {
+      employee_id: string;
+      employee_number: string;
+      full_name: string;
+      department_code: string;
+      department_name: string;
+      timezone: string;
+      active: boolean;
+      total_count: string;
+    };
+
+    const result = await this.pool.query<Row>(
+      `SELECT
+         employee.id AS employee_id,
+         employee.employee_number,
+         employee.full_name,
+         employee.department_code,
+         employee.department_name,
+         employee.timezone,
+         employee.active,
+         count(*) OVER ()::text AS total_count
+       FROM hr_employee_directory employee
+       WHERE employee.active
+         AND NOT EXISTS (
+           SELECT 1
+           FROM hr_late_arrivals late
+           WHERE late.employee_id = employee.id
+             AND late.scheduled_start >= $1::timestamptz
+             AND late.scheduled_start < $2::timestamptz
+         )
+       ORDER BY employee.full_name, employee.employee_number
+       LIMIT $3`,
+      [period.startInclusive, period.endExclusive, SEARCH_LIMIT],
+    );
+
+    return limitedResult(result.rows, SEARCH_LIMIT, (row) => ({
+      employeeId: row.employee_id,
+      employeeNumber: row.employee_number,
+      fullName: row.full_name,
+      departmentCode: row.department_code,
+      departmentName: row.department_name,
+      timezone: row.timezone,
+      active: row.active,
     }));
   }
 

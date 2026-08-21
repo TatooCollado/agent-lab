@@ -83,12 +83,13 @@ describe("POST /api/agent/query", () => {
     ).get("/api/agent/capabilities");
 
     expect(response.status).toBe(200);
-    expect(response.body.capabilities).toHaveLength(6);
+    expect(response.body.capabilities).toHaveLength(7);
     expect(
       response.body.capabilities.map((item: { tool: string }) => item.tool),
     ).toEqual([
       "count_employees",
       "list_employees",
+      "list_employees_without_late_arrivals",
       "summarize_employee_delays",
       "list_late_arrivals",
       "list_absences",

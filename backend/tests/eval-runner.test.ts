@@ -83,6 +83,14 @@ describe("runAgentEvals", () => {
             "Bruno tiene una demora.",
           );
         }
+        if (prompt.includes("no llegó tarde")) {
+          return answer(
+            "list_employees_without_late_arrivals",
+            1,
+            [{ employeeNumber: "EMP-003" }],
+            "Carla no llegó tarde.",
+          );
+        }
         if (prompt.includes("EMP-NOT-FOUND")) {
           return answer("find_employee", 0, [], "No se encontraron empleados.");
         }
@@ -107,13 +115,13 @@ describe("runAgentEvals", () => {
     const result = await runAgentEvals(agent, fixtures);
 
     expect(result).toMatchObject({
-      passed: 6,
+      passed: 7,
       failed: 0,
-      total: 6,
+      total: 7,
       passRate: 1,
     });
     expect(result.results.map((item) => item.score)).toEqual([
-      1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1,
     ]);
     expect(fixtures.cleanupFreshnessFixture).toHaveBeenCalledWith(fixture);
   });
@@ -138,6 +146,14 @@ describe("runAgentEvals", () => {
             "Bruno tiene una demora.",
           );
         }
+        if (prompt.includes("no llegó tarde")) {
+          return answer(
+            "list_employees_without_late_arrivals",
+            1,
+            [{ employeeNumber: "EMP-003" }],
+            "Carla no llegó tarde.",
+          );
+        }
         if (prompt.includes(fixture.employeeNumber))
           throw new Error("simulated model failure");
         if (prompt.includes("EMP-NOT-FOUND"))
@@ -150,7 +166,7 @@ describe("runAgentEvals", () => {
     const result = await runAgentEvals(agent, fixtures);
 
     expect(result.failed).toBe(1);
-    expect(result.results[5]).toMatchObject({
+    expect(result.results[6]).toMatchObject({
       caseId: "source-of-truth-freshness",
       passed: false,
       score: 0,

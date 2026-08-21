@@ -35,6 +35,9 @@ describe("InProcessMcpGateway", () => {
           truncated: false,
         };
       },
+      async listEmployeesWithoutLateArrivals() {
+        return { records: [], total: 0, truncated: false };
+      },
       async listAbsences() {
         return { records: [], total: 0, truncated: false };
       },
@@ -52,6 +55,7 @@ describe("InProcessMcpGateway", () => {
         "find_employee",
         "summarize_employee_delays",
         "list_late_arrivals",
+        "list_employees_without_late_arrivals",
         "list_absences",
       ]);
       await expect(
@@ -65,6 +69,11 @@ describe("InProcessMcpGateway", () => {
       await expect(
         gateway.callTool("list_late_arrivals", { period: "current_month" }),
       ).resolves.toMatchObject({ source: "postgresql", count: 1, total: 1 });
+      await expect(
+        gateway.callTool("list_employees_without_late_arrivals", {
+          period: "current_month",
+        }),
+      ).resolves.toMatchObject({ source: "postgresql", count: 0, total: 0 });
     } finally {
       await gateway.close();
     }

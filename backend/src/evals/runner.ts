@@ -190,6 +190,17 @@ export async function runAgentEvals(
 
   results.push(
     await runCase(agent, {
+      id: "employees-without-late-arrivals",
+      title: "Negative attendance set complement",
+      prompt: "¿Quién no llegó tarde el último mes?",
+      expectedTool: "list_employees_without_late_arrivals",
+      expectedCount: 1,
+      expectedEmployeeNumber: "EMP-003",
+    }),
+  );
+
+  results.push(
+    await runCase(agent, {
       id: "known-late-arrivals",
       title: "Known grounded records",
       prompt: "¿Qué empleados llegaron tarde durante el último mes?",

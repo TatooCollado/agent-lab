@@ -3,11 +3,13 @@ import { calculatePeriod } from "../shared/time/period.js";
 import type {
   AbsencesOutput,
   CountEmployeesOutput,
+  EmployeesWithoutLateArrivalsOutput,
   FindEmployeeInput,
   FindEmployeeOutput,
   LateArrivalsOutput,
   ListEmployeesOutput,
   PeriodInput,
+  PeriodOnlyInput,
   SummarizeEmployeeDelaysInput,
   SummarizeEmployeeDelaysOutput,
 } from "./contracts.js";
@@ -91,6 +93,27 @@ export class HrToolService {
       queriedAt: now.toISOString(),
       period,
       employeeNumber: input.employeeNumber ?? null,
+      count: result.records.length,
+      total: result.total,
+      truncated: result.truncated,
+      records: result.records,
+    };
+  }
+
+  async listEmployeesWithoutLateArrivals(
+    input: PeriodOnlyInput,
+  ): Promise<EmployeesWithoutLateArrivalsOutput> {
+    const now = this.now();
+    const period = calculatePeriod(input.period, {
+      now,
+      timezone: this.timezone,
+    });
+    const result =
+      await this.repository.listEmployeesWithoutLateArrivals(period);
+    return {
+      source: "postgresql",
+      queriedAt: now.toISOString(),
+      period,
       count: result.records.length,
       total: result.total,
       truncated: result.truncated,

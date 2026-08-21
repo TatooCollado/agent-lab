@@ -151,6 +151,7 @@ El servidor utiliza el SDK oficial de Model Context Protocol para exponer:
 - `find_employee`: busca por nombre o número de empleado;
 - `summarize_employee_delays`: agrega las tardanzas históricas de una persona por nombre o legajo;
 - `list_late_arrivals`: lista llegadas tarde por período y empleado opcional;
+- `list_employees_without_late_arrivals`: calcula en PostgreSQL qué empleados activos no tuvieron llegadas tarde durante el período;
 - `list_absences`: lista ausencias por período y empleado opcional.
 
 Las herramientas declaran `readOnlyHint`, validan entrada y salida con Zod y devuelven tanto contenido textual como `structuredContent`. Los resultados incluyen fuente, fecha de consulta, período aplicado, cantidad total y señal de truncamiento. Cada llamada consulta PostgreSQL nuevamente; no hay caché en esta etapa.
@@ -180,7 +181,7 @@ React → POST /api/agent/query → HrAgentOrchestrator
       → tool result → Ollama → respuesta + TraceEvent[]
 ```
 
-El MCP Client descubre las herramientas disponibles, pero el modelo recibe únicamente las tres definiciones presentes en una allowlist controlada. Los esquemas de function calling son estrictos y las llamadas paralelas están desactivadas para que cada ejecución del MVP sea simple de inspeccionar.
+El MCP Client descubre las herramientas disponibles, pero el router entrega al modelo una única definición de la allowlist controlada por ejecución. Los esquemas de function calling son estrictos y las llamadas paralelas están desactivadas para que cada ejecución sea simple de inspeccionar.
 
 `grounded: true` significa que el orquestador verificó una llamada a una herramienta aprobada y recibió `structuredContent` antes de solicitar la respuesta final. No significa que exista una garantía matemática sobre cada token producido por el modelo; esa calidad debe medirse con evaluaciones.
 
@@ -225,14 +226,15 @@ La respuesta contiene `answer`, `model`, `grounded`, `toolsUsed` y una secuencia
 
 Antes de llamar al modelo, un router TypeScript normaliza la pregunta y la compara con una matriz explícita de capacidades. Cada intención soportada reduce el catálogo entregado al LLM a una única herramienta MCP de mínimo alcance:
 
-| Capacidad                            | Herramienta                 |
-| ------------------------------------ | --------------------------- |
-| contar empleados                     | `count_employees`           |
-| listar el directorio                 | `list_employees`            |
-| buscar una persona                   | `find_employee`             |
-| resumir demoras históricas           | `summarize_employee_delays` |
-| consultar llegadas tarde por período | `list_late_arrivals`        |
-| consultar ausencias por período      | `list_absences`             |
+| Capacidad                              | Herramienta                            |
+| -------------------------------------- | -------------------------------------- |
+| contar empleados                       | `count_employees`                      |
+| listar el directorio                   | `list_employees`                       |
+| buscar una persona                     | `find_employee`                        |
+| resumir demoras históricas             | `summarize_employee_delays`            |
+| consultar llegadas tarde por período   | `list_late_arrivals`                   |
+| consultar quién no tuvo llegadas tarde | `list_employees_without_late_arrivals` |
+| consultar ausencias por período        | `list_absences`                        |
 
 Una pregunta fuera de esta matriz se rechaza antes de consumir inferencia con HTTP `422` y `unsupported_agent_query`. El catálogo público se consulta en `GET /api/agent/capabilities` y también aparece en el System index.
 
@@ -242,6 +244,8 @@ Después de ejecutar MCP, `AnswerPresentation` valida el `structuredContent` med
 - `answer`: narrativa grounded generada por el LLM, visible en un panel secundario identificado como no determinista.
 
 Las cantidades, tablas, fechas, estados vacíos y metadatos de fuente se muestran desde `presentation`; no se extraen del texto del modelo. La traza incorpora `agent.capability.routed` y `presentation.payload.validated` para hacer visibles ambas decisiones técnicas.
+
+La consulta negada se implementa como diferencia de conjuntos: empleados activos menos empleados con al menos una llegada tarde dentro del período. PostgreSQL ejecuta esa semántica mediante `NOT EXISTS`; el LLM no calcula el complemento. Si Groq devuelve una respuesta final vacía o intenta una segunda tool call durante la finalización, el adaptador realiza un único reintento textual con los mismos datos grounded. El evento `llm.grounded_response.completed` informa `recovery=not_required`, el tipo de retry aplicado o el fallback a la presentación determinista.
 
 ## Autenticación y autorización
 
@@ -319,6 +323,7 @@ Casos implementados:
 - `employee-count`: comprueba que una pregunta de cantidad se enruta exclusivamente a `count_employees`;
 - `employee-directory`: comprueba que una solicitud de nombres se enruta a `list_employees` y recupera el directorio;
 - `employee-delay-summary`: comprueba la agregación determinista de demoras de Bruno Silva mediante `summarize_employee_delays`;
+- `employees-without-late-arrivals`: comprueba routing de negación, diferencia de conjuntos y el resultado esperado `EMP-003`;
 - `known-late-arrivals`: compara herramienta, grounding y cantidad contra el dataset sembrado;
 - `unknown-employee`: exige resultado PostgreSQL vacío y una respuesta explícita sin datos inventados;
 - `source-of-truth-freshness`: inserta un empleado temporal único y una llegada tarde, consulta el registro recién creado y comprueba que el agente observa la actualización.

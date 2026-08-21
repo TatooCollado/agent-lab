@@ -15,6 +15,10 @@ export const periodInputSchema = z.object({
   employeeNumber: z.string().trim().min(1).max(50).optional(),
 });
 
+export const periodOnlyInputSchema = z.object({
+  period: periodNameSchema.describe("Período calendario predefinido"),
+});
+
 const resultMetadataSchema = z.object({
   source: z.literal("postgresql"),
   queriedAt: z.string(),
@@ -112,6 +116,12 @@ export const lateArrivalsOutputSchema = resultMetadataSchema.extend({
   records: z.array(lateArrivalRecordSchema),
 });
 
+export const employeesWithoutLateArrivalsOutputSchema =
+  resultMetadataSchema.extend({
+    period: periodSchema,
+    records: z.array(employeeRecordSchema),
+  });
+
 export const absencesOutputSchema = resultMetadataSchema.extend({
   period: periodSchema,
   employeeNumber: z.string().nullable(),
@@ -128,6 +138,10 @@ export type SummarizeEmployeeDelaysOutput = z.infer<
   typeof summarizeEmployeeDelaysOutputSchema
 >;
 export type PeriodInput = z.infer<typeof periodInputSchema>;
+export type PeriodOnlyInput = z.infer<typeof periodOnlyInputSchema>;
 export type FindEmployeeOutput = z.infer<typeof findEmployeeOutputSchema>;
 export type LateArrivalsOutput = z.infer<typeof lateArrivalsOutputSchema>;
+export type EmployeesWithoutLateArrivalsOutput = z.infer<
+  typeof employeesWithoutLateArrivalsOutputSchema
+>;
 export type AbsencesOutput = z.infer<typeof absencesOutputSchema>;

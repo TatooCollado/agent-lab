@@ -85,6 +85,7 @@ export function StructuredAnswer({
       break;
     case "employee_directory":
     case "employee_search":
+    case "employees_without_late_arrivals":
       content = <EmployeeTable records={presentation.data.records} />;
       break;
     case "employee_delay_summary":

@@ -94,6 +94,7 @@ export function createApp(
         "Purpose-built employee count tool",
         "Purpose-built employee directory tool",
         "Purpose-built employee delay aggregation tool",
+        "Purpose-built negative attendance tool",
         "MCP stdio transport (local)",
         "MCP in-process transport (serverless)",
         "PostgreSQL",
@@ -120,6 +121,8 @@ export function createApp(
         "Trace Contract",
         "Deterministic capability routing",
         "Typed answer presentation payloads",
+        "SQL set complement with NOT EXISTS",
+        "Bounded LLM finalization retry",
       ],
       pending: [],
     });

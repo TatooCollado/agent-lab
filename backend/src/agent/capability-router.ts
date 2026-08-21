@@ -40,6 +40,16 @@ export const AGENT_CAPABILITIES: readonly AgentCapability[] = [
       ),
   },
   {
+    id: "employees_without_late_arrivals",
+    label: "Empleados sin llegadas tarde",
+    tool: "list_employees_without_late_arrivals",
+    examples: ["¿Quién no llegó tarde el último mes?"],
+    matches: (question) =>
+      /(no\s+(llego|llegaron)\s+tarde|sin\s+(llegadas\s+tarde|demoras|tardanzas|retrasos)|no\s+(tuvo|tuvieron)\s+(demoras|tardanzas|retrasos))/.test(
+        question,
+      ),
+  },
+  {
     id: "employee_delay_summary",
     label: "Resumen histórico de demoras",
     tool: "summarize_employee_delays",

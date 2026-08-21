@@ -3,6 +3,7 @@ import { traceEventSchema } from "../observability/trace-event.js";
 import {
   absencesOutputSchema,
   countEmployeesOutputSchema,
+  employeesWithoutLateArrivalsOutputSchema,
   findEmployeeOutputSchema,
   lateArrivalsOutputSchema,
   listEmployeesOutputSchema,
@@ -21,6 +22,10 @@ export const answerPresentationSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("employee_directory"),
     data: listEmployeesOutputSchema,
+  }),
+  z.object({
+    kind: z.literal("employees_without_late_arrivals"),
+    data: employeesWithoutLateArrivalsOutputSchema,
   }),
   z.object({
     kind: z.literal("employee_search"),
@@ -89,5 +94,5 @@ export interface AgentLlm {
     tools: AgentToolDefinition[];
     plan: AgentPlan;
     toolOutputs: AgentToolOutput[];
-  }): Promise<{ answer: string; model: string }>;
+  }): Promise<{ answer: string; model: string; recovery?: string }>;
 }

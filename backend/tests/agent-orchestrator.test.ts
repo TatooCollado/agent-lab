@@ -26,6 +26,7 @@ class FakeGateway implements McpGateway {
       "find_employee",
       "summarize_employee_delays",
       "list_late_arrivals",
+      "list_employees_without_late_arrivals",
       "list_absences",
     ];
   }
@@ -46,6 +47,18 @@ class FakeGateway implements McpGateway {
       return {
         ...base,
         employeeNumber: null,
+        period: {
+          name: "previous_calendar_month",
+          timezone: "America/Argentina/Buenos_Aires",
+          startInclusive: "2026-07-01T00:00:00-03:00",
+          endExclusive: "2026-08-01T00:00:00-03:00",
+        },
+        records: [],
+      };
+    }
+    if (name === "list_employees_without_late_arrivals") {
+      return {
+        ...base,
         period: {
           name: "previous_calendar_month",
           timezone: "America/Argentina/Buenos_Aires",
@@ -89,7 +102,9 @@ class FakeLlm implements AgentLlm {
               ? { query: "Inexistente" }
               : selected.name === "list_late_arrivals"
                 ? { period: "previous_calendar_month", employeeNumber: null }
-                : {},
+                : selected.name === "list_employees_without_late_arrivals"
+                  ? { period: "previous_calendar_month" }
+                  : {},
         },
       ],
       continuation: [],
@@ -140,6 +155,11 @@ describe("HrAgentOrchestrator", () => {
       "llm.grounded_response.completed",
       "presentation.payload.validated",
     ]);
+    expect(
+      result.trace.find(
+        (item) => item.name === "llm.grounded_response.completed",
+      )?.output,
+    ).toMatchObject({ recovery: "not_required" });
     expect(gateway.closed).toBe(true);
   });
 
@@ -173,6 +193,25 @@ describe("HrAgentOrchestrator", () => {
     ).rejects.toThrow(/unapproved tool/i);
     expect(gateway.calls).toHaveLength(0);
     expect(gateway.closed).toBe(true);
+  });
+
+  it("routes an explicit negation to the SQL set-complement tool", async () => {
+    const llm = new FakeLlm();
+    const gateway = new FakeGateway();
+    const agent = new HrAgentOrchestrator(llm, () => gateway);
+
+    const result = await agent.run(
+      "¿Quién no llegó tarde el último mes?",
+      requestId,
+    );
+
+    expect(gateway.calls).toEqual([
+      {
+        name: "list_employees_without_late_arrivals",
+        arguments: { period: "previous_calendar_month" },
+      },
+    ]);
+    expect(result.presentation.kind).toBe("employees_without_late_arrivals");
   });
 
   it("rejects a query outside the declared capability matrix", async () => {

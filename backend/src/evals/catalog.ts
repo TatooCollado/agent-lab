@@ -26,6 +26,18 @@ export const EVAL_CATALOG = [
     ],
   },
   {
+    id: "employees-without-late-arrivals",
+    title: "Negative attendance set complement",
+    technique: "Negation routing evaluation",
+    prompt: "¿Quién no llegó tarde el último mes?",
+    invariants: [
+      "grounded=true",
+      "tool=list_employees_without_late_arrivals",
+      "database count=1",
+      "employee=EMP-003",
+    ],
+  },
+  {
     id: "known-late-arrivals",
     title: "Known grounded records",
     technique: "Reference-based evaluation",

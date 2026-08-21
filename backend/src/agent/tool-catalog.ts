@@ -13,8 +13,8 @@ const periodProperty = {
 
 export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
   new Map([
-  [
-    "count_employees",
+    [
+      "count_employees",
       {
         type: "function",
         name: "count_employees",
@@ -29,8 +29,8 @@ export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
         strict: true,
       },
     ],
-  [
-    "find_employee",
+    [
+      "find_employee",
       {
         type: "function",
         name: "find_employee",
@@ -48,45 +48,46 @@ export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
         },
         strict: true,
       },
-  ],
-  [
-    "list_employees",
-    {
-      type: "function",
-      name: "list_employees",
-      description:
-        "Lista todos los empleados con legajo, nombre, departamento y estado. Usala para preguntas como '¿quiénes son los empleados?' o 'mostrame la nómina'.",
-      parameters: {
-        type: "object",
-        properties: {},
-        required: [],
-        additionalProperties: false,
-      },
-      strict: true,
-    },
-  ],
-  [
-    "summarize_employee_delays",
-    {
-      type: "function",
-      name: "summarize_employee_delays",
-      description:
-        "Calcula las demoras o tardanzas totales históricas de un empleado buscado por nombre o legajo. Devuelve cantidad de llegadas tarde, minutos totales, promedio y máximo.",
-      parameters: {
-        type: "object",
-        properties: {
-          query: {
-            type: "string",
-            description: "Nombre o número de empleado, por ejemplo Bruno Silva",
-          },
+    ],
+    [
+      "list_employees",
+      {
+        type: "function",
+        name: "list_employees",
+        description:
+          "Lista todos los empleados con legajo, nombre, departamento y estado. Usala para preguntas como '¿quiénes son los empleados?' o 'mostrame la nómina'.",
+        parameters: {
+          type: "object",
+          properties: {},
+          required: [],
+          additionalProperties: false,
         },
-        required: ["query"],
-        additionalProperties: false,
+        strict: true,
       },
-      strict: true,
-    },
-  ],
-  [
+    ],
+    [
+      "summarize_employee_delays",
+      {
+        type: "function",
+        name: "summarize_employee_delays",
+        description:
+          "Calcula las demoras o tardanzas totales históricas de un empleado buscado por nombre o legajo. Devuelve cantidad de llegadas tarde, minutos totales, promedio y máximo.",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description:
+                "Nombre o número de empleado, por ejemplo Bruno Silva",
+            },
+          },
+          required: ["query"],
+          additionalProperties: false,
+        },
+        strict: true,
+      },
+    ],
+    [
       "list_late_arrivals",
       {
         type: "function",
@@ -102,6 +103,24 @@ export const CONTROLLED_TOOL_CATALOG: ReadonlyMap<string, AgentToolDefinition> =
             },
           },
           required: ["period", "employeeNumber"],
+          additionalProperties: false,
+        },
+        strict: true,
+      },
+    ],
+    [
+      "list_employees_without_late_arrivals",
+      {
+        type: "function",
+        name: "list_employees_without_late_arrivals",
+        description:
+          "Lista empleados activos que no tuvieron ninguna llegada tarde durante el período solicitado. Usala para preguntas negadas como '¿quién no llegó tarde el último mes?'.",
+        parameters: {
+          type: "object",
+          properties: {
+            period: periodProperty,
+          },
+          required: ["period"],
           additionalProperties: false,
         },
         strict: true,

@@ -35,6 +35,10 @@ export type AnswerPresentation =
       data: ResultMetadata & { records: EmployeeRecord[] };
     }
   | {
+      kind: "employees_without_late_arrivals";
+      data: ResultMetadata & { period: Period; records: EmployeeRecord[] };
+    }
+  | {
       kind: "employee_search";
       data: ResultMetadata & { query: string; records: EmployeeRecord[] };
     }

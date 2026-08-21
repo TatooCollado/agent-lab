@@ -25,8 +25,8 @@ describe("GET /api/evals/catalog", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.execution).toBe("npm run evals:run");
-    expect(response.body.cases).toHaveLength(6);
-    expect(response.body.cases[5]).toMatchObject({
+    expect(response.body.cases).toHaveLength(7);
+    expect(response.body.cases[6]).toMatchObject({
       id: "source-of-truth-freshness",
       technique: "Dynamic fixture evaluation",
     });

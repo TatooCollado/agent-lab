@@ -4,11 +4,13 @@ import {
   absencesOutputSchema,
   countEmployeesInputSchema,
   countEmployeesOutputSchema,
+  employeesWithoutLateArrivalsOutputSchema,
   findEmployeeInputSchema,
   findEmployeeOutputSchema,
   lateArrivalsOutputSchema,
   listEmployeesInputSchema,
   listEmployeesOutputSchema,
+  periodOnlyInputSchema,
   periodInputSchema,
   summarizeEmployeeDelaysInputSchema,
   summarizeEmployeeDelaysOutputSchema,
@@ -106,8 +108,7 @@ export function createHrMcpServer(
       outputSchema: summarizeEmployeeDelaysOutputSchema,
       annotations: readOnlyAnnotations,
     },
-    async (input) =>
-      executeTool(() => service.summarizeEmployeeDelays(input)),
+    async (input) => executeTool(() => service.summarizeEmployeeDelays(input)),
   );
 
   server.registerTool(
@@ -121,6 +122,20 @@ export function createHrMcpServer(
       annotations: readOnlyAnnotations,
     },
     async (input) => executeTool(() => service.listLateArrivals(input)),
+  );
+
+  server.registerTool(
+    "list_employees_without_late_arrivals",
+    {
+      title: "Listar empleados sin llegadas tarde",
+      description:
+        "Lista empleados activos que no registraron ninguna llegada tarde durante el período solicitado.",
+      inputSchema: periodOnlyInputSchema,
+      outputSchema: employeesWithoutLateArrivalsOutputSchema,
+      annotations: readOnlyAnnotations,
+    },
+    async (input) =>
+      executeTool(() => service.listEmployeesWithoutLateArrivals(input)),
   );
 
   server.registerTool(

@@ -65,4 +65,40 @@ describe("StructuredAnswer", () => {
       screen.getByText("No records matched the query."),
     ).toBeInTheDocument();
   });
+
+  it("renders employees produced by the set-complement payload", () => {
+    render(
+      <StructuredAnswer
+        presentation={{
+          kind: "employees_without_late_arrivals",
+          data: {
+            ...metadata,
+            period: {
+              name: "previous_calendar_month",
+              timezone: "America/Argentina/Buenos_Aires",
+              startInclusive: "2026-07-01T00:00:00-03:00",
+              endExclusive: "2026-08-01T00:00:00-03:00",
+            },
+            records: [
+              {
+                employeeId: "11111111-1111-4111-8111-111111111113",
+                employeeNumber: "EMP-003",
+                fullName: "Carla Méndez",
+                departmentCode: "FIN",
+                departmentName: "Finance",
+                timezone: "America/Argentina/Buenos_Aires",
+                active: true,
+              },
+            ],
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText("employees_without_late_arrivals"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Carla Méndez")).toBeInTheDocument();
+    expect(screen.getByText("EMP-003")).toBeInTheDocument();
+  });
 });

@@ -56,6 +56,21 @@ function repository(): HrRepository {
       total: 0,
       truncated: false,
     }),
+    listEmployeesWithoutLateArrivals: vi.fn().mockResolvedValue({
+      records: [
+        {
+          employeeId: "550e8400-e29b-41d4-a716-446655440003",
+          employeeNumber: "EMP-003",
+          fullName: "Carla Méndez",
+          departmentCode: "FIN",
+          departmentName: "Finance",
+          timezone,
+          active: true,
+        },
+      ],
+      total: 1,
+      truncated: false,
+    }),
     listAbsences: vi.fn().mockResolvedValue({
       records: [],
       total: 0,
@@ -164,5 +179,25 @@ describe("HrToolService", () => {
     await service.listAbsences({ period: "current_month" });
 
     expect(repo.listAbsences).toHaveBeenCalledTimes(2);
+  });
+
+  it("passes the period to the deterministic set-complement query", async () => {
+    const repo = repository();
+    const service = new HrToolService(repo, timezone, () => fixedNow);
+
+    const output = await service.listEmployeesWithoutLateArrivals({
+      period: "previous_calendar_month",
+    });
+
+    expect(repo.listEmployeesWithoutLateArrivals).toHaveBeenCalledWith({
+      name: "previous_calendar_month",
+      timezone,
+      startInclusive: "2026-07-01T00:00:00-03:00",
+      endExclusive: "2026-08-01T00:00:00-03:00",
+    });
+    expect(output).toMatchObject({
+      count: 1,
+      records: [{ employeeNumber: "EMP-003", fullName: "Carla Méndez" }],
+    });
   });
 });

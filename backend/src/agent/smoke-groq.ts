@@ -124,6 +124,34 @@ if (
   );
 }
 
+const employeesWithoutLateResult = await agent.run(
+  "¿Quién no llegó tarde el último mes?",
+  randomUUID(),
+);
+const employeesWithoutLateEvent = employeesWithoutLateResult.trace.find(
+  (item) => item.name === "mcp.tool.call.completed",
+);
+const employeesWithoutLateOutput = employeesWithoutLateEvent?.output as
+  | Record<string, unknown>
+  | undefined;
+const employeesWithoutLateRecord = Array.isArray(
+  employeesWithoutLateOutput?.records,
+)
+  ? (employeesWithoutLateOutput.records[0] as
+      | Record<string, unknown>
+      | undefined)
+  : undefined;
+if (
+  !employeesWithoutLateResult.grounded ||
+  !employeesWithoutLateResult.toolsUsed.includes(
+    "list_employees_without_late_arrivals",
+  ) ||
+  employeesWithoutLateOutput?.count !== 1 ||
+  employeesWithoutLateRecord?.employeeNumber !== "EMP-003"
+) {
+  throw new Error("Groq negative attendance capability mismatch");
+}
+
 console.info(
   JSON.stringify({
     status: "ok",
@@ -157,6 +185,13 @@ console.info(
         databaseCount: employeeDirectoryOutput.count,
         answer: employeeDirectoryResult.answer,
         traceEvents: employeeDirectoryResult.trace.length,
+      },
+      {
+        question: "employees-without-late-arrivals",
+        toolsUsed: employeesWithoutLateResult.toolsUsed,
+        databaseCount: employeesWithoutLateOutput.count,
+        answer: employeesWithoutLateResult.answer,
+        traceEvents: employeesWithoutLateResult.trace.length,
       },
     ],
   }),

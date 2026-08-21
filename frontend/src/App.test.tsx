@@ -308,7 +308,9 @@ describe("App", () => {
     expect(screen.getByText("Deployment Smoke Test")).toBeInTheDocument();
     expect(screen.getByText("Capability Routing")).toBeInTheDocument();
     expect(screen.getByText("Deterministic Presentation")).toBeInTheDocument();
+    expect(screen.getByText("Set Complement")).toBeInTheDocument();
+    expect(screen.getByText("Controlled Retry")).toBeInTheDocument();
     expect(await screen.findByText("list_employees")).toBeInTheDocument();
-    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(26);
+    expect(document.querySelectorAll(".concept-grid article")).toHaveLength(28);
   });
 });

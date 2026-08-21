@@ -1,6 +1,7 @@
 import {
   absencesOutputSchema,
   countEmployeesOutputSchema,
+  employeesWithoutLateArrivalsOutputSchema,
   findEmployeeOutputSchema,
   lateArrivalsOutputSchema,
   listEmployeesOutputSchema,
@@ -36,6 +37,11 @@ export function createAnswerPresentation(
       return {
         kind: "late_arrivals",
         data: lateArrivalsOutputSchema.parse(toolOutput.output),
+      };
+    case "list_employees_without_late_arrivals":
+      return {
+        kind: "employees_without_late_arrivals",
+        data: employeesWithoutLateArrivalsOutputSchema.parse(toolOutput.output),
       };
     case "list_absences":
       return {

@@ -6,6 +6,7 @@ const expectedTools = [
   "find_employee",
   "list_absences",
   "list_employees",
+  "list_employees_without_late_arrivals",
   "list_late_arrivals",
   "summarize_employee_delays",
 ];
@@ -89,6 +90,25 @@ try {
     throw new Error("Expected two seeded late arrivals from PostgreSQL");
   }
 
+  const employeesWithoutLateArrivals = structured(
+    await client.callTool({
+      name: "list_employees_without_late_arrivals",
+      arguments: { period: "previous_calendar_month" },
+    }),
+  );
+  const withoutLateRecord = Array.isArray(employeesWithoutLateArrivals.records)
+    ? (employeesWithoutLateArrivals.records[0] as
+        | Record<string, unknown>
+        | undefined)
+    : undefined;
+  if (
+    employeesWithoutLateArrivals.source !== "postgresql" ||
+    employeesWithoutLateArrivals.count !== 1 ||
+    withoutLateRecord?.employeeNumber !== "EMP-003"
+  ) {
+    throw new Error("Expected Carla as the seeded set-complement result");
+  }
+
   const noEmployee = structured(
     await client.callTool({
       name: "find_employee",
@@ -117,6 +137,7 @@ try {
       listedEmployees: employeeDirectory.count,
       brunoTotalLateMinutes: delayRecord.totalLateMinutes,
       previousMonthLateArrivals: lateArrivals.count,
+      previousMonthWithoutLateArrivals: employeesWithoutLateArrivals.count,
       currentMonthAbsences: absences.count,
       zeroResultSearch: noEmployee.count,
     }),

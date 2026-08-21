@@ -304,23 +304,37 @@ El comando devuelve un JSON reproducible con `passRate`, duración, checks esper
 
 ## Deployment cloud
 
-`render.yaml` define dos servicios independientes desde el mismo repositorio:
+El repositorio conserva `frontend/` y `backend/` separados, con dos superficies de despliegue:
 
-- `agent-lab-ignac`: frontend Vite como Static Site gratuito;
-- `agent-lab-api-ignac`: backend Express como Web Service gratuito en Virginia.
+- `agent-lab-ignac`: frontend Vite como Render Static Site;
+- `agent-lab-api-ignac`: backend Express como una Vercel Function con Fluid Compute.
 
-El static site reescribe `/api/*` hacia el backend. Para el navegador, autenticación y cookies continúan bajo el origen del frontend; el token de sesión permanece `HttpOnly` y no se expone a React.
+`render.yaml` sólo administra el frontend y reescribe `/api/*` hacia `https://agent-lab-api-ignac.vercel.app`. Para el navegador, autenticación y cookies continúan bajo el origen del frontend; el token de sesión permanece `HttpOnly` y no se expone a React.
 
-En desarrollo local, `LLM_PROVIDER=ollama` conserva `qwen3:8b`. En Render, el Blueprint configura `LLM_PROVIDER=groq` y `openai/gpt-oss-20b`, que soporta function calling. El adaptador Groq usa el endpoint compatible con OpenAI Chat Completions, fuerza al menos una herramienta y devuelve su resultado al modelo para producir la respuesta grounded.
+`backend/vercel.json` declara Express, un máximo de 300 segundos y la región `gru1` (São Paulo), cercana a la base Neon. Vercel detecta `src/server.ts` por su exportación default. El mismo archivo conserva `app.listen()` fuera de Vercel para desarrollo local.
 
-El backend público añade:
+El transporte MCP se selecciona mediante `MCP_TRANSPORT`:
 
-- headers HTTP de seguridad mediante Helmet;
-- límite de 10 intentos de login cada 15 minutos por IP;
-- límite de 30 ejecuciones de agente o finanzas por minuto por IP;
-- health check `GET /api/health`;
-- secretos declarados con `sync: false` o generados por Render.
+- `stdio`: desarrollo local; el cliente inicia un proceso MCP independiente;
+- `in_process`: Vercel; cliente y servidor MCP se conectan con un par de transportes en memoria, sin perder el protocolo, contratos, validación ni tool discovery.
 
-El build del backend usa `npm ci --include=dev` porque TypeScript y `@types/node` son dependencias de compilación. Render configura `NODE_ENV=production` para el servicio; sin esa opción, npm omitiría las herramientas necesarias antes de ejecutar `tsc`.
+En desarrollo local, `LLM_PROVIDER=ollama` conserva `qwen3:8b`. En Vercel, `LLM_PROVIDER=groq` usa `openai/gpt-oss-20b`, que soporta function calling. El adaptador Groq fuerza al menos una herramienta y devuelve su resultado al modelo para producir la respuesta grounded.
 
-Render Free es apropiado para esta demostración. El Web Service se suspende luego de 15 minutos sin tráfico y el primer acceso posterior puede tardar aproximadamente un minuto. El filesystem es efímero; el estado persistente continúa en Neon.
+Variables de producción requeridas en el proyecto Vercel:
+
+```text
+NODE_ENV=production
+FRONTEND_ORIGIN=https://agent-lab-ignac.onrender.com
+APP_TIMEZONE=America/Argentina/Buenos_Aires
+SESSION_TTL_HOURS=8
+PUBLIC_BASE_URL=https://agent-lab-api-ignac.vercel.app
+MCP_TRANSPORT=in_process
+LLM_PROVIDER=groq
+GROQ_MODEL=openai/gpt-oss-20b
+GROQ_API_KEY=<secret>
+DATABASE_READONLY_URL=<secret>
+DATABASE_ADMIN_URL=<secret>
+A2A_INTERNAL_TOKEN=<secret-aleatorio-de-32-o-mas-caracteres>
+```
+
+El backend público añade headers con Helmet, rate limits, manejo explícito de errores y `GET /api/health`. Los límites en memoria son demostrativos y operan por instancia caliente; una aplicación productiva distribuida usaría un store compartido. PostgreSQL conserva usuarios, sesiones y datos, por lo que el filesystem serverless permanece descartable.

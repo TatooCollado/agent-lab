@@ -19,6 +19,7 @@ const envSchema = z.object({
   SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(168).default(8),
   PUBLIC_BASE_URL: z.string().url().default("http://127.0.0.1:3000"),
   A2A_INTERNAL_TOKEN: optionalInternalToken,
+  MCP_TRANSPORT: z.enum(["stdio", "in_process"]).default("stdio"),
   DATABASE_READONLY_URL: optionalUrl,
   DATABASE_ADMIN_URL: optionalUrl,
   DATABASE_MIGRATION_URL: optionalUrl,

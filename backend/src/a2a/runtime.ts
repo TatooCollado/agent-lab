@@ -3,7 +3,7 @@ import type express from "express";
 import { DefaultRequestHandler, InMemoryTaskStore } from "@a2a-js/sdk/server";
 import { agentCardHandler, jsonRpcHandler, UserBuilder } from "@a2a-js/sdk/server/express";
 import { createDefaultAgent } from "../agent/factory.js";
-import { StdioMcpGateway } from "../agent/mcp-gateway.js";
+import { createConfiguredMcpGateway } from "../agent/mcp-gateway.js";
 import { createAgentCards } from "./cards.js";
 import { FinanceAgentExecutor, HrAgentExecutor } from "./executors.js";
 import { A2aFinanceCoordinator } from "./finance-client.js";
@@ -20,7 +20,7 @@ export function registerA2aRuntime(app: express.Express, baseUrl: string, token:
   const financeHandler = new DefaultRequestHandler(
     cards.finance,
     new InMemoryTaskStore(),
-    new FinanceAgentExecutor(() => new StdioMcpGateway())
+    new FinanceAgentExecutor(() => createConfiguredMcpGateway())
   );
   const hrHandler = new DefaultRequestHandler(
     cards.hr,

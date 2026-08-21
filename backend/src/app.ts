@@ -79,6 +79,8 @@ export function createApp(options: {
         "Ollama local inference",
         "MCP Client",
         "MCP Server",
+        "MCP stdio transport (local)",
+        "MCP in-process transport (serverless)",
         "PostgreSQL",
         "Opaque server-side sessions",
         "RBAC",
@@ -88,13 +90,16 @@ export function createApp(options: {
         "Behavioral evaluations",
         "Dynamic evaluation fixtures",
         "Grounding assertions",
-        "Render Blueprint IaC",
+        "Render Static Site",
+        "Vercel Functions",
+        "Fluid Compute",
+        "Region-aware serverless deployment",
         "Groq cloud inference",
         "HTTP security headers",
         "Rate limiting",
         "Trace Contract"
       ],
-      pending: ["Cloud resource provisioning"]
+      pending: ["Production deployment verification"]
     });
   });
 
@@ -267,6 +272,19 @@ export function createApp(options: {
       });
     }
   });
+
+  app.use(((error, _req, res, _next) => {
+    console.error("Unhandled request error", {
+      requestId: res.locals.requestId ?? "unknown",
+      error: error instanceof Error ? error.message : "Unknown error"
+    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "internal_server_error",
+        requestId: res.locals.requestId ?? "unknown"
+      });
+    }
+  }) satisfies express.ErrorRequestHandler);
 
   return app;
 }

@@ -1,5 +1,5 @@
 import { loadEnv } from "../config/env.js";
-import { StdioMcpGateway } from "./mcp-gateway.js";
+import { createConfiguredMcpGateway } from "./mcp-gateway.js";
 import { OllamaChatLlm } from "./ollama-llm.js";
 import { OpenAIResponsesLlm } from "./openai-llm.js";
 import { GroqChatLlm } from "./groq-llm.js";
@@ -10,7 +10,7 @@ export function createDefaultAgent(): HrAgentOrchestrator {
   if (env.LLM_PROVIDER === "ollama") {
     return new HrAgentOrchestrator(
       new OllamaChatLlm(env.OLLAMA_HOST, env.OLLAMA_MODEL),
-      () => new StdioMcpGateway()
+      () => createConfiguredMcpGateway()
     );
   }
   if (env.LLM_PROVIDER === "groq") {
@@ -19,7 +19,7 @@ export function createDefaultAgent(): HrAgentOrchestrator {
     }
     return new HrAgentOrchestrator(
       new GroqChatLlm(env.GROQ_API_KEY, env.GROQ_MODEL),
-      () => new StdioMcpGateway()
+      () => createConfiguredMcpGateway()
     );
   }
   if (!env.OPENAI_API_KEY) {
@@ -27,6 +27,6 @@ export function createDefaultAgent(): HrAgentOrchestrator {
   }
   return new HrAgentOrchestrator(
     new OpenAIResponsesLlm(env.OPENAI_API_KEY, env.OPENAI_MODEL),
-    () => new StdioMcpGateway()
+    () => createConfiguredMcpGateway()
   );
 }

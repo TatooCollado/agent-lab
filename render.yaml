@@ -1,39 +1,5 @@
 services:
   - type: web
-    name: agent-lab-api-ignac
-    runtime: node
-    plan: free
-    region: virginia
-    rootDir: backend
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: npm start
-    healthCheckPath: /api/health
-    autoDeployTrigger: commit
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: APP_TIMEZONE
-        value: America/Argentina/Buenos_Aires
-      - key: SESSION_TTL_HOURS
-        value: 8
-      - key: FRONTEND_ORIGIN
-        value: https://agent-lab-ignac.onrender.com
-      - key: PUBLIC_BASE_URL
-        value: https://agent-lab-api-ignac.onrender.com
-      - key: LLM_PROVIDER
-        value: groq
-      - key: GROQ_MODEL
-        value: openai/gpt-oss-20b
-      - key: GROQ_API_KEY
-        sync: false
-      - key: DATABASE_READONLY_URL
-        sync: false
-      - key: DATABASE_ADMIN_URL
-        sync: false
-      - key: A2A_INTERNAL_TOKEN
-        generateValue: true
-
-  - type: web
     name: agent-lab-ignac
     runtime: static
     rootDir: frontend
@@ -43,7 +9,7 @@ services:
     routes:
       - type: rewrite
         source: /api/*
-        destination: https://agent-lab-api-ignac.onrender.com/api/*
+        destination: https://agent-lab-api-ignac.vercel.app/api/*
       - type: rewrite
         source: /*
         destination: /index.html
